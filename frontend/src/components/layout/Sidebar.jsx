@@ -28,23 +28,23 @@ export default function Sidebar() {
         
         <NavLink to="/cerebro" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <Brain size={16} className="min-w-[20px]" />
-          <span>1. Cerebro</span>
+          <span>1. Mi Marca</span>
         </NavLink>
         <NavLink to="/pluma" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <PenTool size={16} className="min-w-[20px]" />
-          <span>2. Pluma</span>
+          <span>2. Crear Guion</span>
         </NavLink>
         <NavLink to="/camara" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <Video size={16} className="min-w-[20px]" />
-          <span>3. Cámara</span>
+          <span>3. Producir Video</span>
         </NavLink>
         <NavLink to="/rayo" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <Zap size={16} className="min-w-[20px]" />
-          <span>4. Rayo</span>
+          <span>4. Viralizar</span>
         </NavLink>
         <NavLink to="/engranaje" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <RefreshCw size={16} className="min-w-[20px]" />
-          <span>5. Engranaje</span>
+          <span>5. Publicar y Medir</span>
         </NavLink>
 
         <hr className="border-t border-border-soft my-[8px] mx-0" />

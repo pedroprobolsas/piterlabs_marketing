@@ -1,8 +1,10 @@
 import { Brain, PenTool, Video, Zap, RefreshCw, Send, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react';
+import HeroBanner from '../components/dashboard/HeroBanner';
 
 export default function Dashboard() {
   return (
     <div className="w-full">
+      <HeroBanner />
       {/* KPI ROW */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-[16px] mb-[28px]">
         <div className="bg-white border border-border rounded-[14px] p-[22px_24px] relative overflow-hidden transition-all duration-200 hover:border-magenta/25 hover:shadow-[0_4px_20px_rgba(204,0,204,0.08)] after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-magenta after:rounded-b-[14px]">
@@ -35,32 +37,6 @@ export default function Dashboard() {
           <div className="font-jetbrains text-[0.68rem] text-green flex items-center gap-[4px]">
             <ArrowUp size={12} /> Último video viral
           </div>
-        </div>
-      </div>
-
-      {/* HERO BANNER */}
-      <div className="bg-[linear-gradient(135deg,#0a0a14_0%,#1a1a2e_100%)] rounded-[14px] p-[24px_30px] md:p-[32px_40px] mb-[28px] relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-[20px] shadow-[0_10px_30px_rgba(204,0,204,0.15)]">
-        <div className="absolute top-[-50%] right-[-10%] w-[300px] h-[300px] bg-magenta rounded-full blur-[100px] opacity-20 pointer-events-none"></div>
-        <div className="absolute bottom-[-30%] left-[-5%] w-[200px] h-[200px] bg-violet rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
-        
-        <div className="relative z-10 text-center md:text-left">
-          <div className="font-jetbrains text-[0.65rem] text-magenta mb-[6px] uppercase tracking-[2px] font-bold inline-flex items-center gap-[6px]">
-            <div className="w-[6px] h-[6px] rounded-full bg-magenta animate-blink"></div>
-            SISTEMA ACTIVO
-          </div>
-          <h2 className="font-bebas text-[2.2rem] md:text-[3.2rem] text-white tracking-[2px] leading-[1.1] mb-[8px]">
-            MÁQUINA DE CREACIÓN DE<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-magenta-bright to-violet">CONTENIDO INTELIGENTE</span>
-          </h2>
-          <p className="font-syne text-[0.85rem] text-muted max-w-[450px]">
-             Transforma tu estrategia en contenido que convierte. Navega por los 5 bloques para generar, producir y viralizar en minutos.
-          </p>
-        </div>
-        
-        <div className="relative z-10 flex-shrink-0 flex items-center justify-center">
-           <div className="w-[80px] md:w-[120px] h-[80px] md:h-[120px] rounded-full bg-magenta-soft border border-magenta/30 flex items-center justify-center relative">
-             <div className="absolute inset-0 rounded-full border border-magenta/50 animate-[ping_3s_ease-in-out_infinite]"></div>
-             <Brain size={32} className="text-magenta md:w-[48px] md:h-[48px]" />
-           </div>
         </div>
       </div>
 

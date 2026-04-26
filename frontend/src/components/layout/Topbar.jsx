@@ -20,6 +20,7 @@ export default function Topbar({ title, subtitle, toggleSidebar }) {
           </p>
         )}
       </div>
+      </div>
       
       <div className="flex items-center gap-[6px] md:gap-[10px]">
         <button className="font-syne text-[0.82rem] font-bold px-[12px] md:px-[22px] py-[8px] md:py-[10px] rounded-[8px] transition-all duration-200 tracking-[0.3px] bg-transparent border-[1.5px] border-border text-text2 hover:border-magenta hover:text-magenta flex items-center gap-[6px]">

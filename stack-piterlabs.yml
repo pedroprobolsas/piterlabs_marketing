@@ -17,6 +17,16 @@ services:
 
   api:
     image: ghcr.io/pedroprobolsas/piterlabs-api:latest
+    environment:
+      # Configurar con los valores reales del VPS
+      # Opción A: una sola variable (recomendado)
+      - DATABASE_URL=${DATABASE_URL}
+      # Opción B: variables separadas (alternativa)
+      # - DB_HOST=${DB_HOST}
+      # - DB_PORT=${DB_PORT:-5432}
+      # - DB_USER=${DB_USER}
+      # - DB_PASSWORD=${DB_PASSWORD}
+      # - DB_NAME=${DB_NAME:-probolsas_db}
     deploy:
       replicas: 1
       labels:

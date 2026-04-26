@@ -6,7 +6,7 @@ Versión:        2.0
 Fecha:          Abril 2026
 Autor:          Pedro Sandoval — AI Builder & GM Probolsas S.A.S.
 Piloto:         Probolsas S.A.S. — Cúcuta, Colombia
-Dominio piloto: marketing.probolsas.co
+Dominio piloto: ippmarketing.probolsas.co
 Plataforma:     Replicable en cualquier empresa con VPS propio
 Scrum Master:   Claude (revisiones, verificaciones y aprobaciones con Pedro Sandoval)
 ```
@@ -63,7 +63,7 @@ Los resultados de campañas del Módulo B retroalimentan la estrategia del Bloqu
 ┌──────────────────────────────────────────────┐
 │  CAPA 1 — INTERFAZ                           │
 │  React + Vite + TailwindCSS                  │
-│  marketing.probolsas.co                      │
+│  ippmarketing.probolsas.co                      │
 ├──────────────────────────────────────────────┤
 │  CAPA 2 — API BACKEND                        │
 │  Node.js + Express                           │
@@ -707,12 +707,12 @@ PiterLabs Agent es el agente central que orquesta todos los módulos de la plata
 **Objetivo:** `marketing.probolsas.co` funcionando con datos reales
 
 Tareas:
-- Scaffold React + Vite + TailwindCSS
-- Backend Node.js + Express + conexión PostgreSQL
-- Docker Swarm service + Traefik + subdominio
-- CI/CD GitHub Actions
-- Layout del dashboard: navegación de 5 bloques (Módulo A) + módulos operativos (Módulo B)
-- Módulo Clientes 360° con filtros, score de calor y detección de riesgo
+- [x] Scaffold React + Vite + TailwindCSS
+- [x] Backend Node.js + Express + conexión PostgreSQL
+- [x] Docker Swarm service + Traefik + subdominio
+- [x] CI/CD GitHub Actions
+- [x] Layout del dashboard: navegación de 5 bloques (Módulo A) + módulos operativos (Módulo B)
+- [x] Módulo Clientes 360° con filtros, score de calor y detección de riesgo
 
 **Criterio de Done:** dashboard visible en producción con datos reales de clientes
 

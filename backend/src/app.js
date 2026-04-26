@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import clientesRoutes from './routes/clientesRoutes.js';
+import prospectosRoutes from './routes/prospectosRoutes.js';
 
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/clientes', clientesRoutes);
+app.use('/api/prospectos', prospectosRoutes);
 
 // Configuración puerto (se usará el 5050 en docker-compose)
 const PORT = process.env.PORT || 5050;

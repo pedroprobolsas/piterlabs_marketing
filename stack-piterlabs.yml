@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  front:
+    image: piterlabs-front:latest
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.piterlabs_front.rule=Host(`marketing.probolsas.co`)"
+        - "traefik.http.routers.piterlabs_front.entrypoints=websecure"
+        - "traefik.http.routers.piterlabs_front.tls.certresolver=myresolver"
+        - "traefik.http.services.piterlabs_front.loadbalancer.server.port=80"
+    networks:
+      - probolsas
+
+  api:
+    image: piterlabs-api:latest
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.piterlabs_api.rule=Host(`marketing.probolsas.co`) && PathPrefix(`/api`)"
+        - "traefik.http.routers.piterlabs_api.entrypoints=websecure"
+        - "traefik.http.routers.piterlabs_api.tls.certresolver=myresolver"
+        - "traefik.http.services.piterlabs_api.loadbalancer.server.port=5050"
+    networks:
+      - probolsas
+
+networks:
+  probolsas:
+    external: true

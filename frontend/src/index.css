@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Syne", sans-serif;
+  --font-jetbrains: "JetBrains Mono", monospace;
+  --font-bebas: "Bebas Neue", sans-serif;
+
+  --color-bg: #f7f7fa;
+  --color-white: #ffffff;
+  --color-surface: #f0f0f5;
+  --color-border: #e2e2ea;
+  --color-border-soft: #ececf3;
+  --color-magenta: #cc00cc;
+  --color-magenta-bright: #e600e6;
+  --color-magenta-soft: rgba(204,0,204,0.07);
+  --color-magenta-mid: rgba(204,0,204,0.14);
+  --color-magenta-glow: rgba(204,0,204,0.2);
+  --color-text-main: #0a0a14;
+  --color-text2: #3a3a4a;
+  --color-muted: #8888a0;
+  --color-violet: #6b21a8;
+  --color-green: #059669;
+  --color-orange: #d97706;
+  --color-red: #dc2626;
+}
+
+/* Base styles and reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Utility Animations */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.animate-blink {
+  animation: blink 2s infinite;
+}
+
+/* Custom Scrollbar for non-Firefox */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}

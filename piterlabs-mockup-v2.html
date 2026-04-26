@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiterLabs — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f7fa;
+    --white: #ffffff;
+    --surface: #f0f0f5;
+    --border: #e2e2ea;
+    --border-soft: #ececf3;
+    --magenta: #cc00cc;
+    --magenta-bright: #e600e6;
+    --magenta-soft: rgba(204,0,204,0.07);
+    --magenta-mid: rgba(204,0,204,0.14);
+    --magenta-glow: rgba(204,0,204,0.2);
+    --text: #0a0a14;
+    --text2: #3a3a4a;
+    --muted: #8888a0;
+    --violet: #6b21a8;
+    --green: #059669;
+    --orange: #d97706;
+    --red: #dc2626;
+    --sidebar-w: 252px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--magenta-bright), var(--magenta), transparent);
+  }
+
+  /* LOGO */
+  .logo {
+    padding: 28px 22px 20px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .logo-mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--magenta);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 4px 14px var(--magenta-glow);
+  }
+
+  .logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.7rem;
+    letter-spacing: 3px;
+    color: var(--text);
+  }
+
+  .logo-text span { color: var(--magenta); }
+
+  .empresa-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--magenta-soft);
+    border: 1px solid rgba(204,0,204,0.15);
+    border-radius: 6px;
+    padding: 7px 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--magenta);
+    font-weight: 500;
+  }
+
+  .empresa-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--magenta);
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* NAV */
+  .nav-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 0;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+
+  .nav-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    padding: 14px 22px 7px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 22px;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text2);
+    position: relative;
+    border-radius: 0;
+  }
+
+  .nav-item:hover {
+    color: var(--magenta);
+    background: var(--magenta-soft);
+  }
+
+  .nav-item.active {
+    color: var(--magenta);
+    background: var(--magenta-soft);
+    font-weight: 700;
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 6px; bottom: 6px;
+    width: 3px;
+    background: var(--magenta);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .nav-icon { font-size: 1rem; min-width: 20px; text-align: center; }
+
+  .nav-badge {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--magenta-soft);
+    color: var(--magenta);
+    border: 1px solid rgba(204,0,204,0.18);
+    font-weight: 500;
+  }
+
+  .nav-divider {
+    border: none;
+    border-top: 1px solid var(--border-soft);
+    margin: 8px 0;
+  }
+
+  /* AGENT BAR */
+  .agent-bar {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-soft);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--magenta-soft);
+  }
+
+  .agent-avatar {
+    width: 34px; height: 34px;
+    background: var(--magenta);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px var(--magenta-glow);
+  }
+
+  .agent-info { flex: 1; min-width: 0; }
+  .agent-name { font-size: 0.82rem; font-weight: 700; color: var(--text); }
+  .agent-status { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--magenta); margin-top: 2px; }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  /* TOPBAR */
+  .topbar {
+    padding: 22px 36px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--white);
+    flex-shrink: 0;
+  }
+
+  .topbar-left h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.6rem;
+    letter-spacing: 3px;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .topbar-left h1 span { color: var(--magenta); }
+
+  .topbar-left p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.63rem;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .btn {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text2);
+  }
+
+  .btn-ghost:hover { border-color: var(--magenta); color: var(--magenta); }
+
+  .btn-primary {
+    background: var(--magenta);
+    color: #fff;
+    box-shadow: 0 4px 16px var(--magenta-glow);
+  }
+
+  .btn-primary:hover {
+    background: var(--magenta-bright);
+    box-shadow: 0 6px 22px var(--magenta-glow);
+    transform: translateY(-1px);
+  }
+
+  /* CONTENT */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px 36px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  /* KPI ROW */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .kpi-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+
+  .kpi-card:hover {
+    border-color: rgba(204,0,204,0.25);
+    box-shadow: 0 4px 20px rgba(204,0,204,0.08);
+  }
+
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 0 0 14px 14px;
+  }
+
+  .kpi-card:nth-child(1)::after { background: var(--magenta); }
+  .kpi-card:nth-child(2)::after { background: var(--violet); }
+  .kpi-card:nth-child(3)::after { background: var(--orange); }
+  .kpi-card:nth-child(4)::after { background: var(--green); }
+
+  .kpi-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+
+  .kpi-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .kpi-card:nth-child(1) .kpi-value { color: var(--magenta); }
+  .kpi-card:nth-child(2) .kpi-value { color: var(--violet); }
+  .kpi-card:nth-child(3) .kpi-value { color: var(--orange); }
+  .kpi-card:nth-child(4) .kpi-value { color: var(--green); }
+
+  .kpi-delta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .kpi-delta.down { color: var(--red); }
+
+  /* BLOQUES PIPELINE */
+  .bloques-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .bloque-step {
+    flex: 1;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bloque-step:hover {
+    border-color: var(--magenta);
+    box-shadow: 0 4px 16px var(--magenta-soft);
+  }
+
+  .bloque-step.active-step {
+    border-color: var(--magenta);
+    background: var(--magenta-soft);
+    box-shadow: 0 4px 20px rgba(204,0,204,0.12);
+  }
+
+  .bloque-step::after {
+    content: '›';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--border);
+    font-size: 1.2rem;
+    font-weight: 300;
+    z-index: 1;
+  }
+
+  .bloque-step:last-child::after { display: none; }
+
+  .bs-icon { font-size: 1.5rem; display: block; margin-bottom: 7px; }
+  .bs-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.56rem;
+    color: var(--magenta);
+    margin-bottom: 5px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .bs-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    color: var(--text);
+    display: block;
+  }
+  .bs-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.57rem;
+    color: var(--muted);
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* AGENT COMMAND */
+  .agent-command {
+    background: var(--white);
+    border: 1.5px solid var(--magenta);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .agent-command::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--magenta-bright), var(--magenta), transparent);
+  }
+
+  .ac-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .ac-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--magenta);
+    animation: blink 2s infinite;
+    flex-shrink: 0;
+  }
+  .ac-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    color: var(--magenta);
+  }
+  .ac-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .ac-input-row { display: flex; gap: 10px; }
+
+  .ac-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .ac-input:focus { border-color: var(--magenta); }
+  .ac-input::placeholder { color: var(--muted); }
+
+  .ac-btn {
+    background: var(--magenta);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 26px;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px var(--magenta-glow);
+  }
+
+  .ac-btn:hover {
+    background: var(--magenta-bright);
+    box-shadow: 0 6px 20px var(--magenta-glow);
+    transform: translateY(-1px);
+  }
+
+  .ac-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .ac-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    padding: 5px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .ac-tag:hover { border-color: var(--magenta); color: var(--magenta); background: var(--magenta-soft); }
+
+  /* GRID 2-COL */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 18px;
+    margin-bottom: 20px;
+  }
+
+  /* PANEL */
+  .panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .panel-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.35rem;
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+
+  .panel-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 3px;
+  }
+
+  .see-all {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--magenta);
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  /* PIPELINE STAGES */
+  .pipeline-stages {
+    display: flex;
+    gap: 0;
+    margin-bottom: 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .stage {
+    flex: 1;
+    padding: 12px 12px;
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+  }
+
+  .stage:last-child { border-right: none; }
+  .stage.active-s { background: var(--magenta-soft); }
+
+  .stage-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.56rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .stage-count {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stage.active-s .stage-count { color: var(--magenta); }
+
+  .stage-bar {
+    height: 3px;
+    border-radius: 2px;
+    margin-top: 8px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .stage-bar-fill { height: 100%; border-radius: 2px; }
+
+  /* PROSPECT LIST */
+  .prospect-list { display: flex; flex-direction: column; gap: 9px; }
+
+  .prospect-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 13px;
+    background: var(--bg);
+    border-radius: 9px;
+    border: 1px solid var(--border-soft);
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+
+  .prospect-item:hover { border-color: rgba(204,0,204,0.2); background: var(--magenta-soft); }
+
+  .p-avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    color: #fff;
+  }
+
+  .p-info { flex: 1; min-width: 0; }
+  .p-name { font-size: 0.82rem; font-weight: 700; color: var(--text); }
+  .p-sub { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
+
+  .p-temp {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .temp-hot { background: rgba(217,119,6,0.1); color: var(--orange); border: 1px solid rgba(217,119,6,0.2); }
+  .temp-new { background: var(--magenta-soft); color: var(--magenta); border: 1px solid rgba(204,0,204,0.2); }
+  .temp-cold { background: rgba(136,136,160,0.1); color: var(--muted); border: 1px solid var(--border); }
+
+  /* CONTENT PIPELINE */
+  .content-pipeline { display: flex; flex-direction: column; gap: 10px; }
+
+  .cp-item {
+    padding: 13px 15px;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--border-soft);
+    border-left: 3px solid;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .cp-item:hover { background: var(--magenta-soft); border-color: rgba(204,0,204,0.2); }
+  .cp-item.b1 { border-left-color: var(--magenta); }
+  .cp-item.b2 { border-left-color: var(--violet); }
+  .cp-item.b3 { border-left-color: var(--green); }
+
+  .cp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .cp-title { font-size: 0.83rem; font-weight: 700; color: var(--text); }
+
+  .cp-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .st-scripting { background: var(--magenta-soft); color: var(--magenta); }
+  .st-produccion { background: rgba(107,33,168,0.08); color: var(--violet); }
+  .st-aprobado { background: rgba(5,150,105,0.08); color: var(--green); }
+
+  .cp-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+
+  /* MONITOR ROW */
+  .monitor-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .monitor-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+
+  .mc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mc-label::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--magenta);
+    flex-shrink: 0;
+  }
+
+  /* RETENTION */
+  .ret-item { margin-bottom: 8px; }
+  .ret-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .ret-time { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+  .ret-pct { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--text); font-weight: 500; }
+
+  .retention-bar {
+    height: 5px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .retention-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--magenta-bright), var(--magenta));
+  }
+
+  /* SCORE */
+  .score-circle { text-align: center; padding: 8px 0; }
+
+  .score-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    color: var(--magenta);
+    line-height: 1;
+    letter-spacing: 2px;
+  }
+
+  .score-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .score-items { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+
+  .score-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text2);
+  }
+
+  .si-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* CHANNELS */
+  .channel-list { display: flex; flex-direction: column; gap: 9px; }
+
+  .channel-item { display: flex; align-items: center; gap: 8px; }
+  .ch-icon { font-size: 0.95rem; min-width: 18px; text-align: center; }
+  .ch-name { font-size: 0.75rem; font-weight: 600; color: var(--text2); flex: 1; }
+
+  .ch-bar {
+    flex: 2;
+    height: 4px;
+    background: var(--bg);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .ch-fill { height: 100%; border-radius: 2px; }
+  .ch-pct { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--muted); min-width: 28px; text-align: right; }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">PITER<span>LABS</span></div>
+    </div>
+    <div class="empresa-pill">
+      <div class="empresa-dot"></div>
+      Probolsas S.A.S.
+    </div>
+  </div>
+
+  <nav class="nav-scroll">
+    <div class="nav-section-label">// Máquina de Contenido</div>
+    <div class="nav-item active">
+      <span class="nav-icon">🧠</span> Mi Marca
+      <span class="nav-badge">Config</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">✍️</span> Crear Guion
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🎬</span> Producir Video
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚡</span> Viralizar
+      <span class="nav-badge">4 skills</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚙️</span> Publicar y Medir
+    </div>
+
+    <hr class="nav-divider">
+    <div class="nav-section-label">// Centro de Operaciones</div>
+
+    <div class="nav-item">
+      <span class="nav-icon">👥</span> Mis Clientes
+      <span class="nav-badge">312</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🎯</span> Oportunidades
+      <span class="nav-badge">47</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📘</span> Pauta Facebook e Instagram
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🔴</span> Pauta Google
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">✉️</span> Correos y Campañas
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📅</span> Mi Calendario
+    </div>
+  </nav>
+
+  <div class="agent-bar">
+    <div class="agent-avatar">🤖</div>
+    <div class="agent-info">
+      <div class="agent-name">PiterLabs Agent</div>
+      <div class="agent-status">● Activo — Escuchando</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>DASH<span>BOARD</span></h1>
+      <p>// Vista general — Probolsas S.A.S. — Abril 2026</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost">Exportar Reporte</button>
+      <button class="btn btn-primary">+ Nuevo Proyecto</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HERO BANNER -->
+    <div style="background:linear-gradient(135deg,var(--magenta) 0%,#8800aa 100%);border-radius:16px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-40px;right:-40px;width:220px;height:220px;background:rgba(255,255,255,0.05);border-radius:50%;pointer-events:none"></div>
+      <div style="position:absolute;bottom:-60px;right:140px;width:180px;height:180px;background:rgba(255,255,255,0.04);border-radius:50%;pointer-events:none"></div>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:3px;margin-bottom:10px;">// PiterLabs presenta</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:#fff;letter-spacing:3px;line-height:1.05;margin-bottom:10px;">MÁQUINA DE CREACIÓN DE<br>CONTENIDO <span style="opacity:0.75">INTELIGENTE</span></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(255,255,255,0.6);letter-spacing:0.5px;">Estrategia · Guion · Producción · Viralización · Distribución — todo en un solo lugar</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0;margin-left:32px;">
+        <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px 20px;text-align:center;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Agente activo</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;letter-spacing:2px;">PiterLabs Agent</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:5px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#7fff7f;animation:blink 2s infinite;flex-shrink:0"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:rgba(255,255,255,0.65);">Escuchando</span>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 20px;text-align:center;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;">Piezas este mes</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#fff;letter-spacing:2px;line-height:1;">23</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">// Prospectos Activos</div>
+        <div class="kpi-value">47</div>
+        <div class="kpi-delta">↑ +12 esta semana</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">// Piezas Publicadas</div>
+        <div class="kpi-value">23</div>
+        <div class="kpi-delta" style="color:var(--violet)">↑ +8 este mes</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">// ROAS Meta Ads</div>
+        <div class="kpi-value">3.8x</div>
+        <div class="kpi-delta down">↓ -0.2 vs sem. ant.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">// Score Autenticidad</div>
+        <div class="kpi-value">87</div>
+        <div class="kpi-delta">↑ +5 pts promedio</div>
+      </div>
+    </div>
+
+    <!-- BLOQUES -->
+    <div class="bloques-row">
+      <div class="bloque-step active-step">
+        <span class="bs-icon">🧠</span>
+        <span class="bs-num">Paso 01</span>
+        <span class="bs-name">MI MARCA</span>
+        <span class="bs-sub">Marca configurada</span>
+      </div>
+      <div class="bloque-step">
+        <span class="bs-icon">✍️</span>
+        <span class="bs-num">Paso 02</span>
+        <span class="bs-name">CREAR GUION</span>
+        <span class="bs-sub">3 proyectos activos</span>
+      </div>
+      <div class="bloque-step">
+        <span class="bs-icon">🎬</span>
+        <span class="bs-num">Paso 03</span>
+        <span class="bs-name">PRODUCIR VIDEO</span>
+        <span class="bs-sub">1 en producción</span>
+      </div>
+      <div class="bloque-step">
+        <span class="bs-icon">⚡</span>
+        <span class="bs-num">Paso 04</span>
+        <span class="bs-name">VIRALIZAR</span>
+        <span class="bs-sub">4 herramientas activas</span>
+      </div>
+      <div class="bloque-step">
+        <span class="bs-icon">⚙️</span>
+        <span class="bs-num">Paso 05</span>
+        <span class="bs-name">PUBLICAR Y MEDIR</span>
+        <span class="bs-sub">6 canales activos</span>
+      </div>
+    </div>
+
+    <!-- AGENT COMMAND -->
+    <div class="agent-command">
+      <div class="ac-header">
+        <div class="ac-dot"></div>
+        <div class="ac-title">PITERLABS AGENT</div>
+        <div class="ac-sub">// Instrucción en lenguaje natural</div>
+      </div>
+      <div class="ac-input-row">
+        <input class="ac-input" type="text" placeholder="Ej: Genera un mini-documental para el lanzamiento de bolsas biodegradables...">
+        <button class="ac-btn">EJECUTAR</button>
+      </div>
+      <div class="ac-suggestions">
+        <span class="ac-tag">Reporte semanal Meta</span>
+        <span class="ac-tag">Prospectos sin respuesta 48h</span>
+        <span class="ac-tag">Propuesta calendario mayo</span>
+        <span class="ac-tag">Repropósito último video</span>
+        <span class="ac-tag">Clientes en riesgo de fuga</span>
+      </div>
+    </div>
+
+    <!-- 2-COL -->
+    <div class="grid-2">
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">PIPELINE PROSPECTOS</div>
+            <div class="panel-sub">// 47 activos · 3 convertidos esta semana</div>
+          </div>
+          <span class="see-all">Ver todos →</span>
+        </div>
+
+        <div class="pipeline-stages">
+          <div class="stage">
+            <div class="stage-name">Nuevo</div>
+            <div class="stage-count">18</div>
+            <div class="stage-bar"><div class="stage-bar-fill" style="width:100%;background:var(--muted)"></div></div>
+          </div>
+          <div class="stage">
+            <div class="stage-name">Calificado</div>
+            <div class="stage-count">14</div>
+            <div class="stage-bar"><div class="stage-bar-fill" style="width:70%;background:var(--orange)"></div></div>
+          </div>
+          <div class="stage active-s">
+            <div class="stage-name">Cotizado</div>
+            <div class="stage-count">9</div>
+            <div class="stage-bar"><div class="stage-bar-fill" style="width:45%;background:var(--magenta)"></div></div>
+          </div>
+          <div class="stage">
+            <div class="stage-name">Negociando</div>
+            <div class="stage-count">6</div>
+            <div class="stage-bar"><div class="stage-bar-fill" style="width:30%;background:var(--violet)"></div></div>
+          </div>
+          <div class="stage">
+            <div class="stage-name">Convertido</div>
+            <div class="stage-count">3</div>
+            <div class="stage-bar"><div class="stage-bar-fill" style="width:15%;background:var(--green)"></div></div>
+          </div>
+        </div>
+
+        <div class="prospect-list">
+          <div class="prospect-item">
+            <div class="p-avatar" style="background:var(--magenta)">MP</div>
+            <div class="p-info">
+              <div class="p-name">María Pérez — Empaques del Norte</div>
+              <div class="p-sub">Bolsas laminadas · WhatsApp · hace 2h</div>
+            </div>
+            <span class="p-temp temp-hot">🔥 Caliente</span>
+          </div>
+          <div class="prospect-item">
+            <div class="p-avatar" style="background:var(--violet)">JR</div>
+            <div class="p-info">
+              <div class="p-name">Juan Rodríguez — Textiles JR</div>
+              <div class="p-sub">Empaques flex · Web chat · hace 5h</div>
+            </div>
+            <span class="p-temp temp-new">✦ Nuevo</span>
+          </div>
+          <div class="prospect-item">
+            <div class="p-avatar" style="background:var(--muted)">CL</div>
+            <div class="p-info">
+              <div class="p-name">Carlos López — Industrias CL</div>
+              <div class="p-sub">Bolsas biodegradables · WA · hace 3d</div>
+            </div>
+            <span class="p-temp temp-cold">❄ Frío</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">CONTENIDO ACTIVO</div>
+            <div class="panel-sub">// 3 proyectos en producción</div>
+          </div>
+          <span class="see-all">Ver todos →</span>
+        </div>
+
+        <div class="content-pipeline">
+          <div class="cp-item b1">
+            <div class="cp-header">
+              <div class="cp-title">Lanzamiento Bolsas Biodegradables</div>
+              <span class="cp-status st-scripting">Scripting</span>
+            </div>
+            <div class="cp-meta">Mini-Documental · 4 formatos · Humor ON</div>
+          </div>
+          <div class="cp-item b2">
+            <div class="cp-header">
+              <div class="cp-title">Caso de Éxito — Cliente ACME</div>
+              <span class="cp-status st-produccion">Visual Factory</span>
+            </div>
+            <div class="cp-meta">Micro-Novela · Parallax ON · Zero-Click ON</div>
+          </div>
+          <div class="cp-item b3">
+            <div class="cp-header">
+              <div class="cp-title">Tutorial Empaques Flexibles</div>
+              <span class="cp-status st-aprobado">Aprobado ✓</span>
+            </div>
+            <div class="cp-meta">Educativo · 5 piezas · Lunes 9AM</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MONITOR -->
+    <div class="monitor-row">
+
+      <div class="monitor-card">
+        <div class="mc-label">Retención por Segundo</div>
+        <div class="ret-item">
+          <div class="ret-row"><span class="ret-time">0s — Hook</span><span class="ret-pct">100%</span></div>
+          <div class="retention-bar"><div class="retention-fill" style="width:100%"></div></div>
+        </div>
+        <div class="ret-item">
+          <div class="ret-row"><span class="ret-time">3s</span><span class="ret-pct">82%</span></div>
+          <div class="retention-bar"><div class="retention-fill" style="width:82%"></div></div>
+        </div>
+        <div class="ret-item">
+          <div class="ret-row"><span class="ret-time">15s — Planteamiento</span><span class="ret-pct">71%</span></div>
+          <div class="retention-bar"><div class="retention-fill" style="width:71%"></div></div>
+        </div>
+        <div class="ret-item">
+          <div class="ret-row"><span class="ret-time">35s — Clímax</span><span class="ret-pct">64%</span></div>
+          <div class="retention-bar"><div class="retention-fill" style="width:64%"></div></div>
+        </div>
+        <div class="ret-item">
+          <div class="ret-row"><span class="ret-time">55s — Resolución</span><span class="ret-pct">48%</span></div>
+          <div class="retention-bar"><div class="retention-fill" style="width:48%"></div></div>
+        </div>
+      </div>
+
+      <div class="monitor-card">
+        <div class="mc-label">Score de Autenticidad</div>
+        <div class="score-circle">
+          <div class="score-num">87</div>
+          <div class="score-label">Relatable · No corporativo</div>
+        </div>
+        <div class="score-items">
+          <div class="score-item">
+            <div class="si-dot" style="background:var(--green)"></div>
+            Tono humano detectado
+          </div>
+          <div class="score-item">
+            <div class="si-dot" style="background:var(--green)"></div>
+            Hook auténtico
+          </div>
+          <div class="score-item">
+            <div class="si-dot" style="background:var(--orange)"></div>
+            Clímax muy formal — revisar
+          </div>
+        </div>
+      </div>
+
+      <div class="monitor-card">
+        <div class="mc-label">Distribución por Canal</div>
+        <div class="channel-list">
+          <div class="channel-item">
+            <span class="ch-icon">📸</span>
+            <span class="ch-name">Instagram</span>
+            <div class="ch-bar"><div class="ch-fill" style="width:78%;background:var(--magenta)"></div></div>
+            <span class="ch-pct">78%</span>
+          </div>
+          <div class="channel-item">
+            <span class="ch-icon">🎵</span>
+            <span class="ch-name">TikTok</span>
+            <div class="ch-bar"><div class="ch-fill" style="width:65%;background:#ff2d55"></div></div>
+            <span class="ch-pct">65%</span>
+          </div>
+          <div class="channel-item">
+            <span class="ch-icon">▶️</span>
+            <span class="ch-name">YouTube</span>
+            <div class="ch-bar"><div class="ch-fill" style="width:52%;background:#ff0000"></div></div>
+            <span class="ch-pct">52%</span>
+          </div>
+          <div class="channel-item">
+            <span class="ch-icon">💼</span>
+            <span class="ch-name">LinkedIn</span>
+            <div class="ch-bar"><div class="ch-fill" style="width:41%;background:#0077b5"></div></div>
+            <span class="ch-pct">41%</span>
+          </div>
+          <div class="channel-item">
+            <span class="ch-icon">📘</span>
+            <span class="ch-name">Facebook</span>
+            <div class="ch-bar"><div class="ch-fill" style="width:38%;background:#1877f2"></div></div>
+            <span class="ch-pct">38%</span>
+          </div>
+          <div class="channel-item">
+            <span class="ch-icon">𝕏</span>
+            <span class="ch-name">Twitter/X</span>
+            <div class="ch-bar"><div class="ch-fill" style="width:24%;background:var(--muted)"></div></div>
+            <span class="ch-pct">24%</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

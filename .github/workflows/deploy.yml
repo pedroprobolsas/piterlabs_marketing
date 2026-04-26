@@ -1,0 +1,40 @@
+name: Deploy PiterLabs to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Ir al directorio de la app
+            cd /opt/piterlabs_marketing || mkdir -p /opt/piterlabs_marketing
+            cd /opt/piterlabs_marketing
+            
+            # Clonar o actualizar repo (asumiendo que clonamos acá)
+            if [ -d ".git" ]; then
+              git pull origin main
+            else
+              # IMPORTANTE: Reemplazar 'tu-usuario' con el usuario real de GitHub
+              # cuando el repo sea público, o configurar token si es privado
+              git clone https://github.com/PedroProbolsas/piterlabs_marketing.git .
+            fi
+            
+            # Construir imágenes
+            docker build -t piterlabs-front:latest ./frontend
+            docker build -t piterlabs-api:latest ./backend
+            
+            # Desplegar stack
+            docker stack deploy -c stack-piterlabs.yml piterlabs

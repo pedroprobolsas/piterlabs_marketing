@@ -1,5 +1,5 @@
 import { Brain, PenTool, Video, Zap, RefreshCw, Send, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react';
-import HeroBanner from '../components/dashboard/HeroBanner';
+import HeroBanner from '../../components/dashboard/HeroBanner';
 
 export default function Dashboard() {
   return (

@@ -40,11 +40,11 @@ export default function Dashboard() {
 
       {/* BLOQUES PIPELINE */}
       <div className="flex gap-[10px] mb-[24px]">
-        {[{num: 'B.1', name: 'CEREBRO', sub: 'Estrategia', active: false, Icon: Brain },
-          {num: 'B.2', name: 'PLUMA', sub: 'Narrativa', active: true, Icon: PenTool },
-          {num: 'B.3', name: 'CÁMARA', sub: 'Producción', active: false, Icon: Video },
-          {num: 'B.4', name: 'RAYO', sub: 'Impacto', active: false, Icon: Zap },
-          {num: 'B.5', name: 'ENGRANAJE', sub: 'Conversión', active: false, Icon: RefreshCw }]
+        {[{num: 'B.1', name: 'MI MARCA', sub: 'Estrategia', active: false, Icon: Brain },
+          {num: 'B.2', name: 'CREAR GUION', sub: 'Narrativa', active: true, Icon: PenTool },
+          {num: 'B.3', name: 'PRODUCIR VIDEO', sub: 'Producción', active: false, Icon: Video },
+          {num: 'B.4', name: 'VIRALIZAR', sub: 'Impacto', active: false, Icon: Zap },
+          {num: 'B.5', name: 'PUBLICAR Y MEDIR', sub: 'Conversión', active: false, Icon: RefreshCw }]
           .map((b, i) => (
           <div key={b.num} className={`flex-1 bg-white border-[1.5px] rounded-[12px] p-[16px_14px] text-center cursor-pointer transition-all duration-250 relative overflow-hidden 
             ${b.active ? 'border-magenta bg-magenta-soft shadow-[0_4px_20px_rgba(204,0,204,0.12)]' : 'border-border hover:border-magenta hover:shadow-[0_4px_16px_rgba(204,0,204,0.07)]'}

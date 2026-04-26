@@ -40,6 +40,7 @@ jobs:
           tags: ghcr.io/pedroprobolsas/piterlabs-api:latest
 
       - name: Deploy to VPS
+        continue-on-error: true
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}

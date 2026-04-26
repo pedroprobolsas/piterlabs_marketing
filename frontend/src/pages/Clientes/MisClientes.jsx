@@ -9,8 +9,8 @@ export default function MisClientes() {
 
   return (
     <div className="w-full">
-      <div className="bg-white border rounded-[14px] border-border p-[24px]">
-        <div className="flex justify-between items-center mb-[20px]">
+      <div className="bg-white border rounded-[14px] border-border p-[24px] md:p-[24px_32px]">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-[16px] mb-[20px]">
           <div>
             <h2 className="font-bebas text-[1.35rem] tracking-[2px] text-text-main">Directorio de Clientes</h2>
             <p className="font-jetbrains text-[0.6rem] text-muted uppercase tracking-[1.5px] mt-[3px]">Lectura en tiempo real PostgreSQL</p>
@@ -28,26 +28,30 @@ export default function MisClientes() {
         {/* Listado */}
         <div className="flex flex-col gap-[9px]">
           {dummyClientes.map(c => (
-            <div key={c.id} className="flex items-center gap-[12px] p-[11px_13px] bg-bg border border-border-soft rounded-[9px] hover:bg-magenta-soft hover:border-magenta/20 transition-all cursor-pointer">
-              <div className="w-[32px] h-[32px] rounded-[8px] bg-magenta flex items-center justify-center text-[0.72rem] font-extrabold text-white shrink-0">
-                <User size={14} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-[0.82rem] font-bold text-text-main">{c.nombre}</div>
-                <div className="font-jetbrains text-[0.6rem] text-muted mt-[2px] uppercase">
-                  {c.ciudad} • {c.asesor}
+            <div key={c.id} className="flex flex-col sm:flex-row sm:items-center gap-[12px] p-[16px_13px] bg-bg border border-border-soft rounded-[9px] hover:bg-magenta-soft hover:border-magenta/20 transition-all cursor-pointer">
+              <div className="flex items-center gap-[12px] flex-1 min-w-0">
+                <div className="w-[32px] h-[32px] rounded-[8px] bg-magenta flex items-center justify-center text-[0.72rem] font-extrabold text-white shrink-0">
+                  <User size={14} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[0.82rem] font-bold text-text-main truncate">{c.nombre}</div>
+                  <div className="font-jetbrains text-[0.6rem] text-muted mt-[2px] uppercase truncate">
+                    {c.ciudad} • {c.asesor}
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="font-bebas text-[1rem] tracking-[1px] text-text-main">{c.totalCompras}</div>
-                <div className="font-jetbrains text-[0.55rem] text-muted mt-[1px]">{c.ultimCompra}</div>
-              </div>
-              <div className={`font-jetbrains text-[0.58rem] px-[9px] py-[3px] rounded-[20px] font-semibold shrink-0 ml-[12px]
-                ${c.state === 'hot' ? 'bg-orange/10 text-orange border border-orange/20' : ''}
-                ${c.state === 'new' ? 'bg-magenta-soft text-magenta border border-magenta/20' : ''}
-                ${c.state === 'cold' ? 'bg-muted/10 text-muted border border-border' : ''}
-              `}>
-                SCORE: {c.score}
+              <div className="flex items-center justify-between sm:justify-end gap-[12px] w-full sm:w-auto mt-[4px] sm:mt-0 pt-[8px] sm:pt-0 border-t border-border-soft sm:border-0 pl-[44px] sm:pl-0">
+                <div className="text-left sm:text-right">
+                  <div className="font-bebas text-[1rem] tracking-[1px] text-text-main">{c.totalCompras}</div>
+                  <div className="font-jetbrains text-[0.55rem] text-muted mt-[1px]">{c.ultimCompra}</div>
+                </div>
+                <div className={`font-jetbrains text-[0.58rem] px-[9px] py-[3px] rounded-[20px] font-semibold shrink-0
+                  ${c.state === 'hot' ? 'bg-orange/10 text-orange border border-orange/20' : ''}
+                  ${c.state === 'new' ? 'bg-magenta-soft text-magenta border border-magenta/20' : ''}
+                  ${c.state === 'cold' ? 'bg-muted/10 text-muted border border-border' : ''}
+                `}>
+                  SCORE: {c.score}
+                </div>
               </div>
             </div>
           ))}

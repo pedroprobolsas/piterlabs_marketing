@@ -38,17 +38,44 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* HERO BANNER */}
+      <div className="bg-[linear-gradient(135deg,#0a0a14_0%,#1a1a2e_100%)] rounded-[14px] p-[24px_30px] md:p-[32px_40px] mb-[28px] relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-[20px] shadow-[0_10px_30px_rgba(204,0,204,0.15)]">
+        <div className="absolute top-[-50%] right-[-10%] w-[300px] h-[300px] bg-magenta rounded-full blur-[100px] opacity-20 pointer-events-none"></div>
+        <div className="absolute bottom-[-30%] left-[-5%] w-[200px] h-[200px] bg-violet rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
+        
+        <div className="relative z-10 text-center md:text-left">
+          <div className="font-jetbrains text-[0.65rem] text-magenta mb-[6px] uppercase tracking-[2px] font-bold inline-flex items-center gap-[6px]">
+            <div className="w-[6px] h-[6px] rounded-full bg-magenta animate-blink"></div>
+            SISTEMA ACTIVO
+          </div>
+          <h2 className="font-bebas text-[2.2rem] md:text-[3.2rem] text-white tracking-[2px] leading-[1.1] mb-[8px]">
+            MÁQUINA DE CREACIÓN DE<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-magenta-bright to-violet">CONTENIDO INTELIGENTE</span>
+          </h2>
+          <p className="font-syne text-[0.85rem] text-muted max-w-[450px]">
+             Transforma tu estrategia en contenido que convierte. Navega por los 5 bloques para generar, producir y viralizar en minutos.
+          </p>
+        </div>
+        
+        <div className="relative z-10 flex-shrink-0 flex items-center justify-center">
+           <div className="w-[80px] md:w-[120px] h-[80px] md:h-[120px] rounded-full bg-magenta-soft border border-magenta/30 flex items-center justify-center relative">
+             <div className="absolute inset-0 rounded-full border border-magenta/50 animate-[ping_3s_ease-in-out_infinite]"></div>
+             <Brain size={32} className="text-magenta md:w-[48px] md:h-[48px]" />
+           </div>
+        </div>
+      </div>
+
       {/* BLOQUES PIPELINE */}
-      <div className="flex gap-[10px] mb-[24px]">
+      <h3 className="font-jetbrains text-[0.7rem] text-text2 uppercase tracking-[2px] mb-[12px] font-bold">PIPELINE DE PRODUCCIÓN</h3>
+      <div className="flex gap-[10px] mb-[24px] overflow-x-auto pb-[8px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent snap-x">
         {[{num: 'B.1', name: 'MI MARCA', sub: 'Estrategia', active: false, Icon: Brain },
           {num: 'B.2', name: 'CREAR GUION', sub: 'Narrativa', active: true, Icon: PenTool },
           {num: 'B.3', name: 'PRODUCIR VIDEO', sub: 'Producción', active: false, Icon: Video },
           {num: 'B.4', name: 'VIRALIZAR', sub: 'Impacto', active: false, Icon: Zap },
           {num: 'B.5', name: 'PUBLICAR Y MEDIR', sub: 'Conversión', active: false, Icon: RefreshCw }]
           .map((b, i) => (
-          <div key={b.num} className={`flex-1 bg-white border-[1.5px] rounded-[12px] p-[16px_14px] text-center cursor-pointer transition-all duration-250 relative overflow-hidden 
+          <div key={b.num} className={`flex-none w-[160px] md:flex-1 md:w-auto bg-white border-[1.5px] rounded-[12px] p-[16px_14px] text-center cursor-pointer transition-all duration-250 relative overflow-hidden snap-center
             ${b.active ? 'border-magenta bg-magenta-soft shadow-[0_4px_20px_rgba(204,0,204,0.12)]' : 'border-border hover:border-magenta hover:shadow-[0_4px_16px_rgba(204,0,204,0.07)]'}
-            ${i !== 4 ? `after:content-['›'] after:absolute after:right-[-6px] after:top-[50%] after:-translate-y-1/2 after:text-border after:text-[1.2rem] after:font-light after:z-10` : ''}`}>
+            ${i !== 4 ? `after:content-['›'] after:absolute after:right-[4px] md:after:right-[-6px] after:top-[50%] after:-translate-y-1/2 after:text-border after:text-[1.2rem] after:font-light after:z-10` : ''}`}>
              <b.Icon className="mx-auto mb-[7px]" size={24} color={b.active ? '#cc00cc' : '#3a3a4a'} />
              <span className="font-jetbrains text-[0.56rem] text-magenta mb-[5px] block uppercase tracking-[1px]">{b.num}</span>
              <span className="font-bebas text-[0.9rem] tracking-[1.5px] text-text-main block">{b.name}</span>
@@ -58,23 +85,25 @@ export default function Dashboard() {
       </div>
 
       {/* AGENT COMMAND */}
-      <div className="bg-white border-[1.5px] border-magenta rounded-[14px] p-[22px_26px] mb-[24px] relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-gradient-to-r before:from-magenta-bright before:via-magenta before:to-transparent">
-        <div className="flex items-center gap-[12px] mb-[14px]">
-          <div className="w-[10px] h-[10px] rounded-full bg-magenta animate-blink shrink-0"></div>
-          <div className="font-bebas text-[1.2rem] tracking-[2px] text-magenta">OPENCLAW COMMAND</div>
-          <div className="font-jetbrains text-[0.62rem] text-muted ml-auto">PiterLabs Agent v2.0</div>
+      <div className="bg-white border-[1.5px] border-magenta rounded-[14px] p-[16px_20px] md:p-[22px_26px] mb-[24px] relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-gradient-to-r before:from-magenta-bright before:via-magenta before:to-transparent">
+        <div className="flex flex-col md:flex-row md:items-center gap-[6px] md:gap-[12px] mb-[14px]">
+          <div className="flex items-center gap-[12px]">
+            <div className="w-[10px] h-[10px] rounded-full bg-magenta animate-blink shrink-0"></div>
+            <div className="font-bebas text-[1.2rem] tracking-[2px] text-magenta">OPENCLAW COMMAND</div>
+          </div>
+          <div className="font-jetbrains text-[0.62rem] text-muted md:ml-auto">PiterLabs Agent v2.0</div>
         </div>
         
-        <div className="flex gap-[10px]">
-          <input type="text" placeholder="Instruye a Piter (ej: 'Dame el reporte semanal de Meta Ads')" className="flex-1 bg-bg border-[1.5px] border-border rounded-[8px] p-[12px_16px] text-text-main font-jetbrains text-[0.82rem] outline-none transition-colors duration-200 focus:border-magenta" />
-          <button className="bg-magenta border-none rounded-[8px] px-[26px] py-[12px] text-white font-bebas text-[1.1rem] tracking-[2px] cursor-pointer transition-all shadow-[0_4px_14px_rgba(204,0,204,0.2)] hover:bg-magenta-bright hover:shadow-[0_6px_20px_rgba(204,0,204,0.2)] hover:-translate-y-[1px] flex items-center gap-[8px]">
+        <div className="flex flex-col md:flex-row gap-[10px]">
+          <input type="text" placeholder="Instruye a Piter (ej: 'Dame el reporte semanal...')" className="flex-1 bg-bg border-[1.5px] border-border rounded-[8px] p-[12px_16px] text-text-main font-jetbrains text-[0.82rem] outline-none transition-colors duration-200 focus:border-magenta" />
+          <button className="bg-magenta border-none rounded-[8px] px-[26px] py-[12px] text-white font-bebas text-[1.1rem] tracking-[2px] cursor-pointer transition-all shadow-[0_4px_14px_rgba(204,0,204,0.2)] hover:bg-magenta-bright hover:shadow-[0_6px_20px_rgba(204,0,204,0.2)] hover:-translate-y-[1px] flex justify-center items-center gap-[8px]">
             <Send size={18} /> EJECUTAR
           </button>
         </div>
         
-        <div className="flex flex-wrap gap-[8px] mt-[12px]">
-          {['Genera 3 versiones del hook para Empaques BIO', 'Cuántos prospectos llegaron esta semana', 'Pausa la campaña si CPC > $0.5'].map(tag => (
-            <span key={tag} className="font-jetbrains text-[0.62rem] p-[5px_12px] bg-bg border border-border rounded-[20px] text-text2 cursor-pointer transition-colors hover:border-magenta hover:text-magenta hover:bg-magenta-soft">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-[8px] mt-[12px]">
+          {['Genera 3 versiones del hook', 'Prospectos esta semana', 'Pausa campaña si CPC > 0.5'].map(tag => (
+            <span key={tag} className="font-jetbrains text-[0.62rem] p-[5px_12px] bg-bg border border-border rounded-[20px] text-text2 cursor-pointer transition-colors hover:border-magenta hover:text-magenta hover:bg-magenta-soft text-center">
               {tag}
             </span>
           ))}

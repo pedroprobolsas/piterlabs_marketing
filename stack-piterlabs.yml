@@ -9,7 +9,7 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.piterlabs_front.rule=Host(`ippmarketing.probolsas.co`)"
         - "traefik.http.routers.piterlabs_front.entrypoints=websecure"
-        - "traefik.http.routers.piterlabs_front.tls.certresolver=myresolver"
+        - "traefik.http.routers.piterlabs_front.tls.certresolver=letsencryptresolver"
         - "traefik.http.services.piterlabs_front.loadbalancer.server.port=80"
         - "com.centurylinklabs.watchtower.enable=true"
     networks:
@@ -23,7 +23,7 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.piterlabs_api.rule=Host(`ippmarketing.probolsas.co`) && PathPrefix(`/api`)"
         - "traefik.http.routers.piterlabs_api.entrypoints=websecure"
-        - "traefik.http.routers.piterlabs_api.tls.certresolver=myresolver"
+        - "traefik.http.routers.piterlabs_api.tls.certresolver=letsencryptresolver"
         - "traefik.http.services.piterlabs_api.loadbalancer.server.port=5050"
         - "com.centurylinklabs.watchtower.enable=true"
     networks:

@@ -25,15 +25,16 @@ export default function MainLayout() {
   return (
     <div className="flex h-[100dvh] w-full overflow-hidden bg-bg text-text-main font-syne relative">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-      {/* Mobile overlay */}
+      {/* Mobile overlay — darkens background when drawer is open */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/40 z-40 md:hidden" 
           onClick={() => setSidebarOpen(false)}
         />
       )}
+      {/* Main content — flex-1 so it fills remaining width on desktop */}
       <div className="flex-1 flex flex-col min-w-0 bg-bg h-full">
-        <Topbar title={title} subtitle={subtitle} toggleSidebar={() => setSidebarOpen(true)} />
+        <Topbar title={title} subtitle={subtitle} toggleSidebar={() => setSidebarOpen(prev => !prev)} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto w-full p-[20px_16px] md:p-[30px_36px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
           <Outlet />
         </main>

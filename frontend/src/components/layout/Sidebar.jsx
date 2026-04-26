@@ -3,7 +3,15 @@ import { Sparkles, Brain, PenTool, Video, Zap, RefreshCw, LayoutDashboard, Users
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   return (
-    <aside className={`w-[252px] bg-white border-r border-border flex flex-col shrink-0 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[3px] before:bg-gradient-to-r before:from-magenta-bright before:via-magenta before:to-transparent z-50 fixed md:relative h-[100dvh] top-0 left-0 transform transition-transform duration-300 md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+    <aside className={`
+      w-[252px] bg-white border-r border-border flex flex-col shrink-0
+      before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[3px]
+      before:bg-gradient-to-r before:from-magenta-bright before:via-magenta before:to-transparent
+      relative
+      fixed top-0 left-0 h-[100dvh] z-50 transition-transform duration-300
+      md:static md:h-full md:translate-x-0 md:z-auto
+      ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+    `}>
       {/* LOGO */}
       <div className="px-[22px] pt-[28px] pb-[20px] border-b border-border-soft">
         <div className="flex items-center gap-[10px] mb-[12px]">

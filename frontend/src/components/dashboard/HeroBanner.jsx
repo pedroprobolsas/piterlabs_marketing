@@ -118,7 +118,7 @@ export default function HeroBanner() {
         ref={canvasRef} 
         className="absolute top-0 left-0 w-full h-full pointer-events-none"
       />
-      <div className="relative z-10 w-full h-full flex flex-col md:flex-row justify-between items-center p-[30px_24px] md:p-[40px] min-h-[220px] md:min-h-[340px] gap-[24px] md:gap-[0]">
+      <div className="relative z-10 w-full h-full flex flex-col md:flex-row justify-between items-center px-[24px] py-[30px] md:pl-[40px] md:pr-[32px] md:py-[40px] min-h-[220px] md:min-h-[340px] gap-[24px] md:gap-[0]">
         
         {/* Left Column */}
         <div className="flex flex-col text-center md:text-left md:w-1/2">

@@ -1,25 +1,61 @@
 import pool from '../db/pool.js';
 
-// ---------------------------------------------------------------
-// Helper: ejecuta una query de forma aislada.
-// Si falla, devuelve [] y loguea el error exacto con la etiqueta.
-// Así el kanban sigue mostrando las columnas que sí funcionan.
-// ---------------------------------------------------------------
+// Helper: query aislada — si falla retorna [] y loguea en UNA sola línea
 async function safeQuery(label, sql, params = []) {
   try {
     const result = await pool.query(sql, params);
+    console.log(`[OK][${label}] ${result.rows.length} filas`);
     return { rows: result.rows, error: null };
   } catch (err) {
-    console.error(`[ProspectosController][${label}] ${err.message}`);
-    console.error(`[ProspectosController][${label}] SQL: ${sql.trim().slice(0, 200)}`);
+    // Todo en UNA línea para que grep lo capture completo
+    console.error(`[ERR][${label}] ${err.message} | code=${err.code} | detail=${err.detail || '-'}`);
     return { rows: [], error: err.message };
   }
 }
 
 // ---------------------------------------------------------------
-// GET /api/prospectos/kanban
-// Devuelve { inactivos, negociacion, nuevos } con datos reales
+// GET /api/prospectos/debug
+// Diagnóstico de conexión DB y acceso a schemas
 // ---------------------------------------------------------------
+export const debugDB = async (req, res) => {
+  const checks = {};
+
+  // Test 1: conexión básica
+  try {
+    const r = await pool.query('SELECT current_user, current_database(), version()');
+    checks.conexion = { ok: true, user: r.rows[0].current_user, db: r.rows[0].current_database };
+  } catch (e) {
+    checks.conexion = { ok: false, error: e.message };
+  }
+
+  // Test 2: schema marketing
+  try {
+    const r = await pool.query('SELECT COUNT(*) FROM marketing.prospectos');
+    checks.marketing = { ok: true, count: r.rows[0].count };
+  } catch (e) {
+    checks.marketing = { ok: false, error: e.message };
+  }
+
+  // Test 3: schema maestros
+  try {
+    await pool.query('SELECT 1 FROM maestros.clientes LIMIT 1');
+    checks.maestros = { ok: true };
+  } catch (e) {
+    checks.maestros = { ok: false, error: e.message };
+  }
+
+  // Test 4: schema crisolweb
+  try {
+    await pool.query('SELECT 1 FROM crisolweb.cotizaciones_clientes LIMIT 1');
+    checks.crisolweb = { ok: true };
+  } catch (e) {
+    checks.crisolweb = { ok: false, error: e.message };
+  }
+
+  console.log('[DEBUG]', JSON.stringify(checks));
+  res.json({ checks });
+};
+
 export const getKanban = async (req, res) => {
   const [inactivosRes, negociacionRes, nuevosRes] = await Promise.all([
 

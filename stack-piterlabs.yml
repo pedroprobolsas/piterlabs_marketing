@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   front:
-    image: piterlabs-front:latest
+    image: ghcr.io/pedroprobolsas/piterlabs-front:latest
     deploy:
       replicas: 1
       labels:
@@ -11,11 +11,12 @@ services:
         - "traefik.http.routers.piterlabs_front.entrypoints=websecure"
         - "traefik.http.routers.piterlabs_front.tls.certresolver=myresolver"
         - "traefik.http.services.piterlabs_front.loadbalancer.server.port=80"
+        - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - probolsas
 
   api:
-    image: piterlabs-api:latest
+    image: ghcr.io/pedroprobolsas/piterlabs-api:latest
     deploy:
       replicas: 1
       labels:
@@ -24,6 +25,7 @@ services:
         - "traefik.http.routers.piterlabs_api.entrypoints=websecure"
         - "traefik.http.routers.piterlabs_api.tls.certresolver=myresolver"
         - "traefik.http.services.piterlabs_api.loadbalancer.server.port=5050"
+        - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - probolsas
 

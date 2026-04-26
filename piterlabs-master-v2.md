@@ -972,6 +972,28 @@ networks:
 
 **Nota Antigravity:** red de overlay es `probolsas`, no `proxy`. Traefik usa la red `probolsas`. No incluir red `internal-db` — no existe. No duplicar clave `external: true`.
 
+### Secrets de GitHub Actions
+
+> ⚠️ **REGLA FIJA — NO MODIFICAR:** Los siguientes nombres de secrets ya están configurados en GitHub y aplican a todos los proyectos del VPS. Siempre usar exactamente estos nombres en cualquier workflow `.yml` de este repositorio o de proyectos futuros en el mismo servidor.
+
+| Secret | Descripción |
+|--------|-------------|
+| `SERVER_IP` | IP o dominio del VPS de producción |
+| `SSH_USER` | Usuario SSH del servidor |
+| `SSH_KEY` | Llave privada SSH (bloque completo `-----BEGIN/END-----`) |
+
+**Uso correcto en deploy.yml:**
+```yaml
+- name: Deploy to VPS
+  uses: appleboy/ssh-action@v1.0.3
+  with:
+    host: ${{ secrets.SERVER_IP }}
+    username: ${{ secrets.SSH_USER }}
+    key: ${{ secrets.SSH_KEY }}
+```
+
+**❌ Nombres incorrectos que NO se deben usar:** `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `HOST`, `SSH_HOST`, ni ninguna otra variante.
+
 ---
 
 ## 10. SCRUM Y APROBACIONES

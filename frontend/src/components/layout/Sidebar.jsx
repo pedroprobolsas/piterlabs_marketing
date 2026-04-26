@@ -8,7 +8,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       bg-white border-r border-border
       flex flex-col shrink-0
       transition-transform duration-300 ease-in-out
-      relative
       before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[3px]
       before:bg-gradient-to-r before:from-magenta-bright before:via-magenta before:to-transparent
       ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}

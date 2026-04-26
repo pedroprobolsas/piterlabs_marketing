@@ -23,16 +23,15 @@ export default function MainLayout() {
   const { title, subtitle } = getPageInfo();
 
   return (
-    <div className="flex flex-row h-[100dvh] w-full overflow-hidden bg-bg text-text-main font-syne">
+    <div className="flex h-[100dvh] overflow-hidden">
 
-      {/* Desktop spacer — reserves 252px in the flex row so content is pushed right.
-          Hidden on mobile since sidebar is a fixed drawer overlay there. */}
-      <div className="hidden md:block w-[252px] shrink-0" />
+      {/* Spacer — desktop only: reserves 252px so content doesn't go under the fixed sidebar */}
+      <div className="hidden md:flex w-[252px] shrink-0" />
 
-      {/* Sidebar — always fixed for smooth transitions on both mobile and desktop */}
+      {/* Sidebar — always fixed */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-      {/* Mobile overlay — darkens background when drawer is open */}
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 md:hidden"
@@ -40,10 +39,10 @@ export default function MainLayout() {
         />
       )}
 
-      {/* Main content — flex-1 fills remaining width on desktop, full width on mobile */}
-      <div className="flex-1 flex flex-col min-w-0 bg-bg h-full overflow-hidden">
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden bg-bg text-text-main font-syne">
         <Topbar title={title} subtitle={subtitle} toggleSidebar={() => setSidebarOpen(prev => !prev)} />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto w-full p-[20px_16px] md:p-[30px_36px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-[20px_16px] md:p-[30px_36px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
           <Outlet />
         </main>
       </div>

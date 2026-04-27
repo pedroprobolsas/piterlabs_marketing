@@ -4,6 +4,7 @@ import { useMarca } from '../../hooks/useMarca';
 import PlantillaSelector from '../../components/pluma/PlantillaSelector';
 import HookValidator from '../../components/pluma/HookValidator';
 import FormatAdapter from '../../components/pluma/FormatAdapter';
+import ExportGuionPDF from '../../components/pluma/ExportGuionPDF';
 
 export default function CrearGuion() {
   const { marca } = useMarca();
@@ -118,7 +119,7 @@ export default function CrearGuion() {
           {/* Guion Canvas */}
           <div className="bg-white border border-border rounded-[14px] overflow-hidden">
             {/* Tabs */}
-            <div className="flex border-b border-border-soft">
+            <div className="flex border-b border-border-soft items-center">
               {[
                 { id: 'guion',    label: '📄 Guion' },
                 { id: 'formatos', label: '📡 Adaptar Formatos' },
@@ -135,13 +136,21 @@ export default function CrearGuion() {
                 </button>
               ))}
               {guion && (
-                <button
-                  onClick={copyGuion}
-                  className="ml-auto flex items-center gap-[5px] font-jetbrains text-[0.6rem] text-muted px-[14px] hover:text-magenta transition-colors cursor-pointer"
-                >
-                  {copied ? <Check size={11} /> : <Copy size={11} />}
-                  {copied ? 'Copiado' : 'Copiar'}
-                </button>
+                <div className="ml-auto flex items-center gap-[6px] pr-[12px]">
+                  <ExportGuionPDF
+                    guion={guion}
+                    tema={tema}
+                    plantilla={plantilla}
+                    marcaNombre={marca?.nombre_marca || ''}
+                  />
+                  <button
+                    onClick={copyGuion}
+                    className="flex items-center gap-[5px] font-jetbrains text-[0.6rem] text-muted border border-border rounded-[6px] px-[9px] py-[5px] hover:text-magenta hover:border-magenta transition-all cursor-pointer bg-white"
+                  >
+                    {copied ? <Check size={11} /> : <Copy size={11} />}
+                    {copied ? 'Copiado' : 'Copiar'}
+                  </button>
+                </div>
               )}
             </div>
 

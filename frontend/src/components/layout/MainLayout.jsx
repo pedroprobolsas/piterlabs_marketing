@@ -14,7 +14,9 @@ export default function MainLayout() {
       case '/clientes':
         return { title: 'MIS CLIENTES', subtitle: 'PostgreSQL Sync via Crisolweb' };
       case '/cerebro':
-        return { title: 'BLOQUE 1: MI MARCA', subtitle: 'Inteligencia y Estrategia' };
+        return { title: 'B.1 — MI MARCA', subtitle: 'Identidad, Arquetipos y Buyer Persona' };
+      case '/pluma':
+        return { title: 'B.2 — CREAR GUION', subtitle: 'Narrativa y Producción de Contenido' };
       default:
         return { title: 'PITERLABS', subtitle: 'Dashboard' };
     }
@@ -26,7 +28,7 @@ export default function MainLayout() {
     <div className="flex h-[100dvh] overflow-hidden bg-bg">
 
       {/* Spacer — desktop only: reserves 252px so content doesn't go under the fixed sidebar */}
-      <div className="hidden md:block w-[252px] shrink-0" />
+      <div className="w-0 md:w-[252px] shrink-0" />
 
       {/* Sidebar — always fixed */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />

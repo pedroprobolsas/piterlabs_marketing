@@ -3,6 +3,8 @@ import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import MisClientes from './pages/Clientes/MisClientes';
 import Prospectos from './pages/Prospectos/Prospectos';
+import MiMarca from './pages/Cerebro/MiMarca';
+import CrearGuion from './pages/Pluma/CrearGuion';
 
 function App() {
   return (
@@ -10,18 +12,27 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="clientes" element={<MisClientes />} />
+          <Route path="clientes"  element={<MisClientes />} />
           <Route path="prospectos" element={<Prospectos />} />
-          <Route path="pluma" element={<div className="p-4">Módulo Pluma - En Construcción</div>} />
-          <Route path="camara" element={<div className="p-4">Módulo Cámara - En Construcción</div>} />
-          <Route path="rayo" element={<div className="p-4">Módulo Rayo - En Construcción</div>} />
-          <Route path="engranaje" element={<div className="p-4">Módulo Engranaje - En Construcción</div>} />
-          <Route path="prospectos" element={<div className="p-4">Módulo Prospectos - En Construcción</div>} />
-          <Route path="email" element={<div className="p-4">Módulo Email Mkt - En Construcción</div>} />
-          <Route path="settings" element={<div className="p-4">Ajustes - En Construcción</div>} />
+          <Route path="cerebro"   element={<MiMarca />} />
+          <Route path="pluma"     element={<CrearGuion />} />
+          <Route path="camara"    element={<ComingSoon title="PRODUCIR VIDEO" />} />
+          <Route path="rayo"      element={<ComingSoon title="VIRALIZAR" />} />
+          <Route path="engranaje" element={<ComingSoon title="PUBLICAR Y MEDIR" />} />
+          <Route path="email"     element={<ComingSoon title="EMAIL MARKETING" />} />
+          <Route path="settings"  element={<ComingSoon title="AJUSTES" />} />
         </Route>
       </Routes>
     </Router>
+  );
+}
+
+function ComingSoon({ title }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-[300px] gap-[10px]">
+      <div className="font-bebas text-[2rem] tracking-[4px] text-muted">{title}</div>
+      <div className="font-jetbrains text-[0.7rem] text-muted">Próximamente</div>
+    </div>
   );
 }
 

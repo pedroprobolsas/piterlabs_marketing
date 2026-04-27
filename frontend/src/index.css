@@ -2,6 +2,7 @@
 
 @theme {
   --font-sans: "Syne", sans-serif;
+  --font-syne: "Syne", sans-serif;
   --font-jetbrains: "JetBrains Mono", monospace;
   --font-bebas: "Bebas Neue", sans-serif;
 
@@ -45,6 +46,26 @@ body {
 }
 .animate-blink {
   animation: blink 2s infinite;
+}
+
+/* Reusable form input */
+.input-base {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: var(--font-jetbrains);
+  font-size: 0.82rem;
+  color: var(--color-text-main);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input-base:focus {
+  border-color: var(--color-magenta);
+}
+.input-base::placeholder {
+  color: var(--color-muted);
 }
 
 /* Custom Scrollbar for non-Firefox */

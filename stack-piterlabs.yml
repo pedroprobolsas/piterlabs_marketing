@@ -32,6 +32,7 @@ services:
       - PG_DATABASE=probolsas_db
       - PG_USER=probolsas_user
       - PG_PASSWORD=Probolsas2026
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     deploy:
       replicas: 1
       labels:

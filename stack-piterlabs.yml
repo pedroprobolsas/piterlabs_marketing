@@ -7,11 +7,11 @@ services:
       replicas: 1
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.piterlabs_front.rule=Host(`ippmarketing.probolsas.co`)"
-        - "traefik.http.routers.piterlabs_front.entrypoints=websecure"
-        - "traefik.http.routers.piterlabs_front.tls.certresolver=letsencryptresolver"
-        - "traefik.http.services.piterlabs_front.loadbalancer.server.port=80"
-        - "com.centurylinklabs.watchtower.enable=true"
+        - "traefik.http.routers.piterlabs-front.rule=Host(`ippmarketing.probolsas.co`)"
+        - "traefik.http.routers.piterlabs-front.tls=true"
+        - "traefik.http.routers.piterlabs-front.tls.certresolver=letsencrypt"
+        - "traefik.http.services.piterlabs-front.loadbalancer.server.port=80"
+        - "traefik.docker.network=probolsas"
     networks:
       - probolsas
 

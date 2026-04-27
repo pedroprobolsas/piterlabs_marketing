@@ -3,6 +3,7 @@ import { Save, Sparkles, Brain, RefreshCw } from 'lucide-react';
 import { useMarca } from '../../hooks/useMarca';
 import ArquetipoSelector from '../../components/cerebro/ArquetipoSelector';
 import BuyerPersonaCard from '../../components/cerebro/BuyerPersonaCard';
+import ExportPDF from '../../components/cerebro/ExportPDF';
 
 const TONOS = [
   { value: 'inspiracional', label: 'Inspiracional', desc: 'Motiva y eleva' },
@@ -29,7 +30,7 @@ export default function MiMarca() {
   const [genPersona, setGenPersona] = useState(false);
   const analysisRef = useRef(null);
 
-  // Pre-fill form when DB data loads
+  // Pre-fill form + cargar análisis guardado cuando llegan datos de BD
   useEffect(() => {
     if (marca) {
       setForm({
@@ -41,6 +42,10 @@ export default function MiMarca() {
       });
       if (marca.buyer_persona && Object.keys(marca.buyer_persona).length) {
         setPersona(marca.buyer_persona);
+      }
+      // Restaurar análisis guardado
+      if (marca.analisis_estrategico) {
+        setAnalysis(marca.analisis_estrategico);
       }
     }
   }, [marca]);
@@ -63,6 +68,8 @@ export default function MiMarca() {
     setAnalyzing(true);
     setAnalysis('');
 
+    let fullText = '';
+
     try {
       const res = await fetch('/api/claude/analizar-marca', {
         method: 'POST',
@@ -82,11 +89,17 @@ export default function MiMarca() {
           try {
             const evt = JSON.parse(line.slice(6));
             if (evt.type === 'text') {
-              setAnalysis(prev => prev + evt.text);
+              fullText += evt.text;
+              setAnalysis(fullText);
               setTimeout(() => analysisRef.current?.scrollTo({ top: analysisRef.current.scrollHeight, behavior: 'smooth' }), 20);
             }
           } catch { /* ignore parse errors on partial chunks */ }
         }
+      }
+
+      // Auto-guardar análisis completo en BD
+      if (fullText) {
+        await saveMarca({ ...form, buyer_persona: persona || {}, analisis_estrategico: fullText });
       }
     } catch (e) {
       setAnalysis(`Error: ${e.message}`);
@@ -109,7 +122,6 @@ export default function MiMarca() {
       const json = await res.json();
       if (json.success && json.data) {
         setPersona(json.data);
-        // Auto-save buyer persona to DB
         await saveMarca({ ...form, buyer_persona: json.data });
       }
     } catch (e) {
@@ -235,18 +247,28 @@ export default function MiMarca() {
 
           {/* Claude Analysis Panel */}
           <div className="bg-white border border-border rounded-[14px] overflow-hidden">
-            <div className="flex items-center justify-between px-[22px] py-[16px] border-b border-border-soft">
+            <div className="flex items-center justify-between px-[22px] py-[14px] border-b border-border-soft gap-[10px] flex-wrap">
               <div className="flex items-center gap-[8px]">
                 <Sparkles size={16} className="text-magenta" />
                 <span className="font-bebas text-[1.1rem] tracking-[2px] text-text-main">ANÁLISIS ESTRATÉGICO</span>
+                {analysis && !analyzing && (
+                  <span className="font-jetbrains text-[0.58rem] text-green bg-green/10 border border-green/20 rounded-full px-[8px] py-[2px]">
+                    Guardado
+                  </span>
+                )}
               </div>
-              <button
-                onClick={handleAnalizar}
-                disabled={analyzing || !form.nombre_marca || !form.industria}
-                className="flex items-center gap-[7px] font-bebas text-[0.85rem] tracking-[1.5px] bg-magenta text-white px-[16px] py-[8px] rounded-[8px] cursor-pointer hover:bg-magenta-bright transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_3px_10px_rgba(204,0,204,0.15)]"
-              >
-                {analyzing ? <><RefreshCw size={14} className="animate-spin" /> ANALIZANDO...</> : <><Sparkles size={14} /> ANALIZAR MARCA</>}
-              </button>
+              <div className="flex items-center gap-[8px]">
+                <ExportPDF marca={{ ...form }} analysis={analysis} />
+                <button
+                  onClick={handleAnalizar}
+                  disabled={analyzing || !form.nombre_marca || !form.industria}
+                  className="flex items-center gap-[7px] font-bebas text-[0.85rem] tracking-[1.5px] bg-magenta text-white px-[16px] py-[8px] rounded-[8px] cursor-pointer hover:bg-magenta-bright transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_3px_10px_rgba(204,0,204,0.15)]"
+                >
+                  {analyzing
+                    ? <><RefreshCw size={14} className="animate-spin" /> ANALIZANDO...</>
+                    : <><Sparkles size={14} /> {analysis ? 'RE-ANALIZAR' : 'ANALIZAR MARCA'}</>}
+                </button>
+              </div>
             </div>
 
             <div

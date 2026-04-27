@@ -23,10 +23,10 @@ export default function MainLayout() {
   const { title, subtitle } = getPageInfo();
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden">
+    <div className="flex h-[100dvh] overflow-hidden bg-bg">
 
       {/* Spacer — desktop only: reserves 252px so content doesn't go under the fixed sidebar */}
-      <div className="hidden md:flex w-[252px] shrink-0" />
+      <div className="hidden md:block w-[252px] shrink-0" />
 
       {/* Sidebar — always fixed */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
@@ -40,7 +40,7 @@ export default function MainLayout() {
       )}
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-bg text-text-main font-syne">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Topbar title={title} subtitle={subtitle} toggleSidebar={() => setSidebarOpen(prev => !prev)} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-[20px_16px] md:p-[30px_36px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
           <Outlet />

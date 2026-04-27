@@ -368,11 +368,38 @@ Separa cada formato con una línea: ---`,
       return res.status(500).json({ success: false, error: 'Sin respuesta de texto' });
     }
 
-    // Parsear el resultado en secciones por formato
+    // Parsear secciones buscando marcadores de formato en el texto
+    // Claude puede añadir intro antes del primer ---, así que buscamos por nombre
     const result = {};
-    const sections = textBlock.text.split(/^---$/m);
-    formatos.forEach((formato, i) => {
-      result[formato] = sections[i]?.trim() || '';
+    const raw = textBlock.text;
+    const sections = raw.split(/\n---+\n?/);
+
+    // Palabras clave por formato para identificar a qué sección pertenece cada bloque
+    const formatoMarkers = {
+      reels:    /reel|instagram|tiktok|vertical/i,
+      linkedin: /linkedin/i,
+      email:    /email|correo|asunto/i,
+      blog:     /blog|artículo/i,
+    };
+
+    // Asignar cada sección al formato que mejor matchea
+    const usedSections = new Set();
+    formatos.forEach(formato => {
+      const marker = formatoMarkers[formato];
+      const matchIdx = sections.findIndex((s, idx) => !usedSections.has(idx) && marker && marker.test(s));
+      if (matchIdx !== -1) {
+        usedSections.add(matchIdx);
+        result[formato] = sections[matchIdx].trim();
+      } else {
+        // fallback: primera sección no usada
+        const fallbackIdx = sections.findIndex((_, idx) => !usedSections.has(idx));
+        if (fallbackIdx !== -1) {
+          usedSections.add(fallbackIdx);
+          result[formato] = sections[fallbackIdx].trim();
+        } else {
+          result[formato] = '';
+        }
+      }
     });
 
     res.json({ success: true, data: result, raw: textBlock.text });

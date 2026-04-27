@@ -35,7 +35,8 @@ export default function ProspectoCard({ prospecto, tipo }) {
     ? { label: 'Última compra', value: prospecto.ultima_compra
           ? new Date(prospecto.ultima_compra).toLocaleDateString('es-CO') : '—' }
     : tipo === 'negociacion'
-    ? { label: 'Cotización', value: prospecto.nro_cotizacion || '—' }
+    ? { label: 'Cotización', value: prospecto.nro_cotizacion
+          ? `${prospecto.nro_cotizacion}${prospecto.fecha_cotizacion ? ' · ' + new Date(prospecto.fecha_cotizacion).toLocaleDateString('es-CO') : ''}` : '—' }
     : null;
 
   return (
@@ -73,11 +74,17 @@ export default function ProspectoCard({ prospecto, tipo }) {
         </div>
       )}
 
-      {/* Footer: fuente + días sin movimiento */}
+      {/* Footer: fuente / vendedor + días sin movimiento / valor */}
       <div className="flex items-center justify-between gap-[8px] mt-[4px]">
-        <span className={`font-jetbrains text-[0.58rem] px-[7px] py-[2px] rounded-full border ${fuente.cls}`}>
-          {fuente.label}
-        </span>
+        {tipo === 'negociacion' ? (
+          <span className="font-jetbrains text-[0.6rem] text-muted truncate max-w-[110px]">
+            {prospecto.vendedor || '—'}
+          </span>
+        ) : (
+          <span className={`font-jetbrains text-[0.58rem] px-[7px] py-[2px] rounded-full border ${fuente.cls}`}>
+            {fuente.label}
+          </span>
+        )}
         {tipo === 'nuevos' && dias !== null && (
           <span className={`font-jetbrains text-[0.6rem] font-bold ${diasColor(dias)}`}>
             {dias === 0 ? 'Hoy' : `${dias}d sin movimiento`}

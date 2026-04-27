@@ -46,7 +46,7 @@ export const debugDB = async (req, res) => {
 
   // Test 4: schema crisolweb
   try {
-    await pool.query('SELECT 1 FROM crisolweb.cotizaciones_clientes LIMIT 1');
+    await pool.query('SELECT 1 FROM crisolweb.analisis_cotizaciones LIMIT 1');
     checks.crisolweb = { ok: true };
   } catch (e) {
     checks.crisolweb = { ok: false, error: e.message };
@@ -79,15 +79,15 @@ export const getKanban = async (req, res) => {
 
     safeQuery('negociacion', `
       SELECT
-        cc.cliente          AS nombre,
-        cc.nro_cotizacion,
-        cc.fecha_aprobacion,
-        cc.valor_total,
-        cc.vendedor,
+        nro_cotizacion,
+        cliente             AS nombre,
+        fecha_creacion      AS fecha_cotizacion,
+        vr_total            AS valor_total,
+        vendedor,
         'negociacion'       AS vista_etapa
-      FROM crisolweb.cotizaciones_clientes cc
-      WHERE cc.fecha_aprobacion > NOW() - INTERVAL '30 days'
-      ORDER BY cc.fecha_aprobacion DESC
+      FROM crisolweb.analisis_cotizaciones
+      WHERE aprobado IS NULL
+      ORDER BY fecha_creacion DESC
       LIMIT 50
     `),
 

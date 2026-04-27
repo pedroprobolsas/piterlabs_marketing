@@ -92,10 +92,10 @@ export default function ExportGuionPDF({ guion, tema, plantilla, marcaNombre }) 
       onClick={handleExport}
       disabled={loading || !guion}
       title={!guion ? 'Genera un guion primero' : 'Exportar guion como PDF'}
-      className="flex items-center gap-[6px] font-bebas text-[0.82rem] tracking-[1.5px] bg-violet text-white px-[14px] py-[7px] rounded-[8px] cursor-pointer hover:bg-violet/80 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_3px_10px_rgba(107,33,168,0.15)]"
+      className="flex items-center gap-[7px] font-bebas text-[0.85rem] tracking-[1.5px] bg-violet text-white px-[16px] py-[8px] rounded-[8px] cursor-pointer hover:bg-violet/80 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_3px_10px_rgba(107,33,168,0.15)]"
     >
-      <FileDown size={13} />
-      {loading ? 'PDF...' : 'PDF'}
+      <FileDown size={14} />
+      {loading ? 'GENERANDO...' : 'EXPORTAR PDF'}
     </button>
   );
 }

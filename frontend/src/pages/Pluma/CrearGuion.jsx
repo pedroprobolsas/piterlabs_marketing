@@ -117,32 +117,27 @@ export default function CrearGuion() {
           </div>
 
           {/* Guion Canvas */}
-          <div className="bg-white border border-border rounded-[14px] overflow-hidden">
-            {/* Tabs */}
-            <div className="flex border-b border-border-soft items-center">
-              {[
-                { id: 'guion',    label: '📄 Guion' },
-                { id: 'formatos', label: '📡 Adaptar Formatos' },
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveSection(tab.id)}
-                  className={`px-[20px] py-[12px] font-jetbrains text-[0.65rem] transition-all cursor-pointer border-b-[2px]
-                    ${activeSection === tab.id
-                      ? 'border-magenta text-magenta bg-magenta-soft'
-                      : 'border-transparent text-muted hover:text-text2'}`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-              {guion && (
-                <div className="ml-auto flex items-center gap-[6px] pr-[12px]">
-                  <ExportGuionPDF
-                    guion={guion}
-                    tema={tema}
-                    plantilla={plantilla}
-                    marcaNombre={marca?.nombre_marca || ''}
-                  />
+          <div className="bg-white border border-border rounded-[14px]">
+
+            {/* Header — igual que Mi Marca análisis */}
+            <div className="flex items-center justify-between px-[22px] py-[14px] border-b border-border-soft gap-[10px] flex-wrap rounded-t-[14px] overflow-hidden">
+              <div className="flex items-center gap-[8px]">
+                <PenTool size={15} className="text-magenta" />
+                <span className="font-bebas text-[1.1rem] tracking-[2px] text-text-main">GUION GENERADO</span>
+                {guion && !generando && (
+                  <span className="font-jetbrains text-[0.58rem] text-green bg-green/10 border border-green/20 rounded-full px-[8px] py-[2px]">
+                    Listo
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-[8px]">
+                <ExportGuionPDF
+                  guion={guion}
+                  tema={tema}
+                  plantilla={plantilla}
+                  marcaNombre={marca?.nombre_marca || ''}
+                />
+                {guion && (
                   <button
                     onClick={copyGuion}
                     className="flex items-center gap-[5px] font-jetbrains text-[0.6rem] text-muted border border-border rounded-[6px] px-[9px] py-[5px] hover:text-magenta hover:border-magenta transition-all cursor-pointer bg-white"
@@ -150,22 +145,43 @@ export default function CrearGuion() {
                     {copied ? <Check size={11} /> : <Copy size={11} />}
                     {copied ? 'Copiado' : 'Copiar'}
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
+            {/* Tabs */}
+            <div className="flex border-b border-border-soft">
+              {[
+                { id: 'guion',    label: '📄 Guion' },
+                { id: 'formatos', label: '📡 Adaptar Formatos' },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSection(tab.id)}
+                  className={`px-[20px] py-[11px] font-jetbrains text-[0.65rem] transition-all cursor-pointer border-b-[2px]
+                    ${activeSection === tab.id
+                      ? 'border-magenta text-magenta bg-magenta-soft'
+                      : 'border-transparent text-muted hover:text-text2'}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Canvas content — sin overflow-hidden en el padre para no recortar el scroll */}
             {activeSection === 'guion' && (
               <div
                 ref={guionRef}
-                className="p-[20px_22px] min-h-[260px] max-h-[560px] overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+                className="overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+                style={{ minHeight: '260px', maxHeight: '640px' }}
               >
                 {guion ? (
-                  <pre className="font-jetbrains text-[0.78rem] text-text-main leading-relaxed whitespace-pre-wrap">
+                  <pre className="font-jetbrains text-[0.78rem] text-text-main leading-relaxed whitespace-pre-wrap p-[20px_22px_32px]">
                     {guion}
                     {generando && <span className="inline-block w-[8px] h-[4px] bg-magenta ml-[3px] animate-blink rounded-sm" />}
                   </pre>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-[180px] text-center gap-[8px]">
+                  <div className="flex flex-col items-center justify-center h-[220px] text-center gap-[8px]">
                     <PenTool size={28} className="text-border" />
                     <div className="font-jetbrains text-[0.68rem] text-muted">
                       Selecciona una plantilla, escribe el tema y haz clic en Generar

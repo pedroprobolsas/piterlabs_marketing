@@ -368,13 +368,12 @@ Separa cada formato con una línea: ---`,
       return res.status(500).json({ success: false, error: 'Sin respuesta de texto' });
     }
 
-    // Parsear secciones buscando marcadores de formato en el texto
-    // Claude puede añadir intro antes del primer ---, así que buscamos por nombre
+    // Parsear usando los H2 (## ) como delimitadores de sección.
+    // Claude usa --- dentro de cada formato para separar bloques internos,
+    // lo que rompe el split por ---. Los headers ## son únicos por formato.
     const result = {};
     const raw = textBlock.text;
-    const sections = raw.split(/\n---+\n?/);
 
-    // Palabras clave por formato para identificar a qué sección pertenece cada bloque
     const formatoMarkers = {
       reels:    /reel|instagram|tiktok|vertical/i,
       linkedin: /linkedin/i,
@@ -382,23 +381,26 @@ Separa cada formato con una línea: ---`,
       blog:     /blog|artículo/i,
     };
 
-    // Asignar cada sección al formato que mejor matchea
-    const usedSections = new Set();
+    // Encontrar todas las posiciones de headers H2 en el texto
+    const h2Regex = /^## .+$/gm;
+    const h2Hits = [...raw.matchAll(h2Regex)].map(m => ({
+      index: m.index,
+      text:  m[0],
+    }));
+
     formatos.forEach(formato => {
       const marker = formatoMarkers[formato];
-      const matchIdx = sections.findIndex((s, idx) => !usedSections.has(idx) && marker && marker.test(s));
-      if (matchIdx !== -1) {
-        usedSections.add(matchIdx);
-        result[formato] = sections[matchIdx].trim();
+      const hit = h2Hits.find(h => marker && marker.test(h.text));
+      if (hit) {
+        // Contenido: desde este H2 hasta el siguiente H2 de otro formato (o fin)
+        const nextHit = h2Hits.find(h => h.index > hit.index && formatos.some(f => {
+          const m = formatoMarkers[f];
+          return f !== formato && m && m.test(h.text);
+        }));
+        const end = nextHit ? nextHit.index : raw.length;
+        result[formato] = raw.slice(hit.index, end).trim();
       } else {
-        // fallback: primera sección no usada
-        const fallbackIdx = sections.findIndex((_, idx) => !usedSections.has(idx));
-        if (fallbackIdx !== -1) {
-          usedSections.add(fallbackIdx);
-          result[formato] = sections[fallbackIdx].trim();
-        } else {
-          result[formato] = '';
-        }
+        result[formato] = '';
       }
     });
 

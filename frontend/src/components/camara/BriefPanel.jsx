@@ -10,9 +10,9 @@ const TABS = [
 ];
 
 const NAR_STYLES = [
-  { id: 'documental_netflix',    label: 'Documental Netflix' },
-  { id: 'hook_viral_tiktok',     label: 'Hook Viral TikTok' },
-  { id: 'storytelling_emocional',label: 'Storytelling Emocional' },
+  { id: 'netflix',   label: 'Documental Netflix' },
+  { id: 'tiktok',    label: 'Hook Viral TikTok' },
+  { id: 'emocional', label: 'Storytelling Emocional' },
 ];
 
 const fileToBase64 = (file) => new Promise((resolve, reject) => {
@@ -46,7 +46,7 @@ export default function BriefPanel({ marca, mediaFile }) {
   const [brief, setBrief]   = useState(null);
   const [error, setError]   = useState('');
   const [activeTab, setActiveTab]     = useState('foto_publicitaria');
-  const [activeNar, setActiveNar]     = useState('documental_netflix');
+  const [activeNar, setActiveNar]     = useState('netflix');
 
   const handleGenerar = async () => {
     if (guion.trim().length < 20) {

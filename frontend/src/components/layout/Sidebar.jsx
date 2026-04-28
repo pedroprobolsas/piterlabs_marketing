@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Sparkles, Brain, PenTool, Video, Zap, RefreshCw, LayoutDashboard, Users, UserPlus, Mail, Settings } from 'lucide-react';
+import { Sparkles, Brain, PenTool, Video, Zap, RefreshCw, LayoutDashboard, Users, UserPlus, Mail, Settings, Wand2 } from 'lucide-react';
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   return (
@@ -84,6 +84,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         <NavLink to="/settings" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <Settings size={16} className="min-w-[20px]" />
           <span>Ajustes</span>
+        </NavLink>
+        <NavLink to="/skills" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
+          <Wand2 size={16} className="min-w-[20px]" />
+          <span>Skills</span>
         </NavLink>
       </div>
 

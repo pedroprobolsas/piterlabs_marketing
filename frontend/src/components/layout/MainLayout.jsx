@@ -19,6 +19,8 @@ export default function MainLayout() {
         return { title: 'B.2 — CREAR GUION', subtitle: 'Narrativa y Producción de Contenido' };
       case '/camara':
         return { title: 'B.3 — PRODUCIR VIDEO', subtitle: 'Frame, Skills y Preview 9:16' };
+      case '/skills':
+        return { title: 'GESTIÓN DE SKILLS', subtitle: 'Instrucciones de producción para Claude' };
       default:
         return { title: 'PITERLABS', subtitle: 'Dashboard' };
     }

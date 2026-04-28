@@ -5,6 +5,7 @@ import clientesRoutes from './routes/clientesRoutes.js';
 import prospectosRoutes from './routes/prospectosRoutes.js';
 import claudeRoutes from './routes/claudeRoutes.js';
 import marcaRoutes from './routes/marcaRoutes.js';
+import skillsRoutes from './routes/skillsRoutes.js';
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use('/api/clientes', clientesRoutes);
 app.use('/api/prospectos', prospectosRoutes);
 app.use('/api/claude', claudeRoutes);
 app.use('/api/marca', marcaRoutes);
+app.use('/api/skills', skillsRoutes);
 
 // Configuración puerto (se usará el 5050 en docker-compose)
 const PORT = process.env.PORT || 5050;

@@ -6,6 +6,7 @@ import Prospectos from './pages/Prospectos/Prospectos';
 import MiMarca from './pages/Cerebro/MiMarca';
 import CrearGuion from './pages/Pluma/CrearGuion';
 import ProducirVideo from './pages/Camara/ProducirVideo';
+import GestionSkills from './pages/Skills/GestionSkills';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="engranaje" element={<ComingSoon title="PUBLICAR Y MEDIR" />} />
           <Route path="email"     element={<ComingSoon title="EMAIL MARKETING" />} />
           <Route path="settings"  element={<ComingSoon title="AJUSTES" />} />
+          <Route path="skills"    element={<GestionSkills />} />
         </Route>
       </Routes>
     </Router>

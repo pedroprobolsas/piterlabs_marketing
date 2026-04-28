@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(xargs grep *)",
+      "Read(//d/PEDRO SANDOVAL/Antigravity/**)",
+      "Bash(curl -sk -X POST https://ippmarketing.probolsas.co/api/claude/validar-hook -H 'Content-Type: application/json' -d '{\"hook\":\"El 80% de las empresas pierde dinero en empaques por este error que nadie menciona\",\"tono_voz\":\"confrontador\",\"industria\":\"Empaques industriales\"}' --max-time 30)",
+      "Bash(curl -sk -X POST https://ippmarketing.probolsas.co/api/claude/generar-guion -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(curl -sk -X POST https://ippmarketing.probolsas.co/api/claude/adaptar-formatos -H 'Content-Type: application/json' -d '{\"guion_base\":\"Tu empresa está perdiendo dinero en empaques y ni te has dado cuenta. El empaque equivocado genera devoluciones, daños en el producto y clientes molestos. En Probolsas analizamos tu proceso y te damos la solución exacta para reducir costos sin sacrificar calidad.\",\"formatos\":[\"reels\",\"linkedin\",\"email\"],\"marca_config\":{\"nombre_marca\":\"Probolsas\",\"tono_voz\":\"confrontador\"}}' --max-time 60)",
+      "Bash(node -e \"const c=[]; process.stdin.on\\('data',d=>c.push\\(d\\)\\); process.stdin.on\\('end',\\(\\)=>{ const j=JSON.parse\\(Buffer.concat\\(c\\)\\); Object.entries\\(j.data||{}\\).forEach\\(\\([k,v]\\)=>console.log\\('\\\\n=='+k.toUpperCase\\(\\)+'==\\\\n'+String\\(v\\).slice\\(0,250\\)+'...'\\)\\); }\\);\")",
+      "Bash(git commit -m 'fix\\(claude\\): adaptar-formatos parser uses format markers instead of index offset *)",
+      "Bash(npm install *)",
+      "Bash(curl -sk -X POST https://ippmarketing.probolsas.co/api/claude/adaptar-formatos -H 'Content-Type: application/json' -d '{\"guion_base\":\"Tu empresa pierde dinero en empaques. El empaque equivocado genera devoluciones y clientes molestos. En Probolsas te damos la solución exacta.\",\"formatos\":[\"reels\",\"linkedin\",\"email\",\"blog\"],\"marca_config\":{\"nombre_marca\":\"Probolsas\",\"tono_voz\":\"confrontador\"}}' --max-time 60)",
+      "Bash(node -e ' *)",
+      "Bash(npm search *)"
+    ]
+  }
+}

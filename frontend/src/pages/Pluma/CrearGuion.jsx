@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { PenTool, Sparkles, Copy, Check, RefreshCw } from 'lucide-react';
 import { useMarca } from '../../hooks/useMarca';
 import PlantillaSelector from '../../components/pluma/PlantillaSelector';
@@ -16,6 +16,13 @@ export default function CrearGuion() {
   const [copied, setCopied]       = useState(false);
   const [activeSection, setActiveSection] = useState('guion'); // 'guion' | 'formatos'
   const guionRef = useRef(null);
+
+  // Guardar en localStorage cuando se termina de generar
+  useEffect(() => {
+    if (!generando && guion) {
+      localStorage.setItem('piterlabs_guion_reciente', guion);
+    }
+  }, [guion, generando]);
 
   const handleGenerarGuion = async () => {
     if (!tema.trim()) return;

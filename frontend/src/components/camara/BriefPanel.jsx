@@ -33,7 +33,9 @@ function CopyButton({ text }) {
 }
 
 export default function BriefPanel({ marca, mediaFile }) {
-  const [guion, setGuion]     = useState('');
+  const [guion, setGuion]     = useState(() => {
+    return localStorage.getItem('piterlabs_guion_reciente') || '';
+  });
   const [loading, setLoading]   = useState(false);
   const [brief, setBrief]       = useState(null);
   const [error, setError]       = useState('');
@@ -54,6 +56,11 @@ export default function BriefPanel({ marca, mediaFile }) {
       })
       .catch(err => console.error('[BriefPanel] Error fetching skills:', err.message));
   }, []);
+
+  // Guardar cambios del textarea en localStorage
+  useEffect(() => {
+    localStorage.setItem('piterlabs_guion_reciente', guion);
+  }, [guion]);
 
   const handleGenerar = async () => {
     if (guion.trim().length < 20) {

@@ -129,7 +129,8 @@ export default function CrearGuion() {
                 {generando
                   ? <><RefreshCw size={15} className="animate-spin" /> GENERANDO</>
                   : <><Sparkles size={15} /> GENERAR</>}
-              </button>
+                </button>
+              </div>
             </div>
           </div>
 

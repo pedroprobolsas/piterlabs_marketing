@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Sparkles, Copy, Check, FileText, RefreshCw } from 'lucide-react';
 
 const TABS = [
-  { id: 'foto_publicitaria',    label: '📸 Foto',    title: 'Foto Publicitaria — GPT Image 2' },
-  { id: 'carrusel',             label: '📋 Carrusel', title: 'Carrusel Educativo — Instagram / LinkedIn' },
-  { id: 'video_cinematografico',label: '🎬 Video',   title: 'Video Cinematográfico — Seedance / Kling' },
-  { id: 'stories',              label: '📱 Stories', title: 'Stories Secuenciales 9:16' },
-  { id: 'narracion',            label: '🎙 Narración',title: 'Narración Viral — ElevenLabs / CapCut' },
+  { id: 'foto_publicitaria',    label: '📸 Foto',    title: 'Foto Publicitaria — GPT Image 2',           desc: 'Pega este prompt en ChatGPT Plus (GPT Image 2) junto con la foto de tu producto. Genera una pieza publicitaria profesional lista para Instagram o Facebook.' },
+  { id: 'carrusel',             label: '🎠 Carrusel', title: 'Carrusel Educativo — Instagram / LinkedIn',  desc: 'Usa esta estructura en Canva o con GPT Image 2. Cada slide tiene el texto y el prompt de imagen correspondiente. Ideal para Instagram y LinkedIn.' },
+  { id: 'video_cinematografico',label: '🎬 Video',   title: 'Video Cinematográfico — Seedance / Kling',   desc: 'Pega este prompt en Seedance 2.0 (via Artlist) o Kling. Incluye versión en inglés y chino nativo para mejor resultado. Genera video cinematográfico de 15-60 segundos.' },
+  { id: 'stories',              label: '📱 Stories', title: 'Stories Secuenciales 9:16',                  desc: 'Pega cada prompt por separado en ChatGPT Plus (GPT Image 2). Genera 3 stories verticales 9:16 con coherencia visual entre ellas para Instagram o TikTok.' },
+  { id: 'narracion',            label: '🎙️ Narración',title: 'Narración Viral — ElevenLabs / CapCut',      desc: 'Copia el estilo que prefieras y pégalo en ElevenLabs o en el generador de voz de CapCut. Script limpio listo para usar — sin editar.' },
 ];
 
 const NAR_STYLES = [
@@ -186,10 +186,15 @@ export default function BriefPanel({ marca, mediaFile }) {
             </div>
 
             {/* Tab title + copy */}
-            <div className="flex items-center justify-between px-[14px] py-[10px] border-b border-border-soft bg-bg-soft gap-[8px]">
-              <span className="font-jetbrains text-[0.62rem] text-text2 font-bold">
-                {TABS.find(t => t.id === activeTab)?.title}
-              </span>
+            <div className="flex items-start justify-between px-[14px] py-[10px] border-b border-border-soft bg-bg-soft gap-[8px]">
+              <div className="flex flex-col gap-[3px] min-w-0">
+                <span className="font-jetbrains text-[0.62rem] text-text2 font-bold">
+                  {TABS.find(t => t.id === activeTab)?.title}
+                </span>
+                <span className="font-jetbrains text-[0.58rem] text-muted leading-snug">
+                  {TABS.find(t => t.id === activeTab)?.desc}
+                </span>
+              </div>
               <CopyButton text={getTabContent()} />
             </div>
 

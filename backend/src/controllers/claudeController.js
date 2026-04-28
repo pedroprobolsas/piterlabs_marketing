@@ -499,10 +499,16 @@ ${skillsPrompt}`,
       system: [
         {
           type: 'text',
-          text: `Eres un experto en producción de contenido digital para marcas latinoamericanas.
-Dominas los prompts de IA generativa: GPT Image 2, Seedance 2.0, Kling AI, ElevenLabs y CapCut.
-Entiendes semiótica visual, cinematografía y copywriting viral.
-CRITICAL: Respond ONLY with a valid JSON object. Never use unescaped double quotes inside string values — use \" to escape any quote within text. No markdown, no backticks, no explanation outside the JSON object.`,
+          text: `Eres un experto en producción de contenido para redes sociales.
+REGLA ABSOLUTA: Responde ÚNICAMENTE con un objeto JSON válido.
+Sin texto antes. Sin texto después. Sin markdown. Sin backticks. Sin explicaciones.
+El JSON debe tener exactamente estas 5 claves:
+- foto_publicitaria: string
+- carrusel: string
+- video_cinematografico: string
+- stories: string
+- narracion: objeto con 3 claves: netflix, tiktok, emocional (cada una string)
+Dentro de los strings, nunca uses comillas dobles. Usa comillas simples si necesitas citar algo.`,
           cache_control: { type: 'ephemeral' },
         },
       ],
@@ -528,6 +534,7 @@ CRITICAL: Respond ONLY with a valid JSON object. Never use unescaped double quot
     }
     const jsonStr = raw.slice(jsonStart, jsonEnd + 1);
 
+    console.log('[generarBrief] raw:', jsonStr.substring(0, 500));
     try {
       // jsonrepair corrige comillas sin escapar, comas sobrantes, newlines
       // literales y otras deformaciones comunes en respuestas de LLMs

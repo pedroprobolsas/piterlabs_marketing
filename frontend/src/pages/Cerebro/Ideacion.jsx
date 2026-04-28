@@ -8,6 +8,7 @@ export default function Ideacion() {
   const [objetivo, setObjetivo] = useState('Generar leads y autoridad');
   const [canal, setCanal] = useState('Instagram Reels / TikTok');
   const [etapaCliente, setEtapaCliente] = useState('Descubrimiento (TOFU)');
+  const [tono, setTono] = useState('Directo');
   const [cantidad, setCantidad] = useState(10);
   
   const [ideas, setIdeas] = useState('');
@@ -26,6 +27,7 @@ export default function Ideacion() {
           objetivo,
           canal,
           etapa_cliente: etapaCliente,
+          tono_ideas: tono,
           cantidad,
           marca_config: marca || {},
         }),
@@ -100,6 +102,22 @@ export default function Ideacion() {
                   <option value="TOFU (Descubrimiento)">TOFU (Descubrimiento y Atracción)</option>
                   <option value="MOFU (Consideración)">MOFU (Consideración y Confianza)</option>
                   <option value="BOFU (Decisión)">BOFU (Decisión y Conversión)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="font-jetbrains text-[0.65rem] text-text2 uppercase tracking-[1px] font-bold block mb-[6px]">Tono Narrativo</label>
+                <select value={tono} onChange={e => setTono(e.target.value)} className="input-base w-full">
+                  <option value="Directo">Directo</option>
+                  <option value="Profesional">Profesional</option>
+                  <option value="Premium">Premium</option>
+                  <option value="Educativo">Educativo</option>
+                  <option value="Técnico">Técnico</option>
+                  <option value="Cercano">Cercano</option>
+                  <option value="Emocional">Emocional</option>
+                  <option value="Gracioso">Gracioso</option>
+                  <option value="Irónico">Irónico</option>
+                  <option value="Provocador">Provocador</option>
                 </select>
               </div>
 

@@ -228,7 +228,7 @@ Escala puntuación: 0-49 débil, 50-74 regular, 75-89 fuerte, 90-100 viral`,
 // Body: { objetivo, canal, etapa_cliente, cantidad, marca_config }
 // ---------------------------------------------------------------
 export const generarIdeas = async (req, res) => {
-  const { objetivo, canal, etapa_cliente, cantidad, marca_config } = req.body;
+  const { objetivo, canal, etapa_cliente, tono_ideas, cantidad, marca_config } = req.body;
 
   if (!objetivo || !canal) {
     return res.status(400).json({ success: false, error: 'objetivo y canal son obligatorios' });
@@ -260,7 +260,7 @@ Datos de entrada:
 - Público objetivo: ${marca_config?.buyer_persona ? `${marca_config.buyer_persona.nombre}, ${marca_config.buyer_persona.ocupacion}. Dolor principal: ${marca_config.buyer_persona.dolor_principal}` : 'No definido'}
 - Objetivo del contenido: ${objetivo}
 - Canal principal: ${canal}
-- Tono de marca: ${marca_config?.tono_voz || 'Profesional'}
+- Tono de comunicación: ${tono_ideas || marca_config?.tono_voz || 'Profesional'}
 - Etapa del embudo: ${etapa_cliente || 'No especificada'}
 - Cantidad de temas: ${cantidad || 10}
 

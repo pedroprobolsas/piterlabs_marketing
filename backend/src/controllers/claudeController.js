@@ -494,8 +494,7 @@ ${skillsPrompt}`,
   try {
     const message = await client.messages.create({
       model: CLAUDE_MODEL,
-      max_tokens: 4500,
-      thinking: { type: 'adaptive' },
+      max_tokens: 8000,
       system: [
         {
           type: 'text',
@@ -526,10 +525,11 @@ Dentro de los strings, nunca uses comillas dobles. Usa comillas simples si neces
       .replace(/^```\s*/i, '')
       .replace(/```\s*$/i, '');
 
+    console.log('[generarBrief] raw text (500):', raw.substring(0, 500));
     const jsonStart = raw.indexOf('{');
     const jsonEnd   = raw.lastIndexOf('}');
     if (jsonStart === -1 || jsonEnd === -1) {
-      console.error('[ClaudeController][generarBrief] Sin objeto JSON en la respuesta');
+      console.error('[ClaudeController][generarBrief] Sin objeto JSON — raw completo:', raw.substring(0, 1000));
       return res.status(500).json({ success: false, error: 'Claude no devolvió un objeto JSON. Intenta de nuevo.' });
     }
     const jsonStr = raw.slice(jsonStart, jsonEnd + 1);

@@ -1,5 +1,6 @@
 import { getClaudeClient, CLAUDE_MODEL } from '../services/claudeClient.js';
 import pool from '../db/pool.js';
+import { jsonrepair } from 'jsonrepair';
 
 // ---------------------------------------------------------------
 // POST /api/claude/analizar-marca
@@ -501,7 +502,7 @@ ${skillsPrompt}`,
           text: `Eres un experto en producción de contenido digital para marcas latinoamericanas.
 Dominas los prompts de IA generativa: GPT Image 2, Seedance 2.0, Kling AI, ElevenLabs y CapCut.
 Entiendes semiótica visual, cinematografía y copywriting viral.
-Respondes ÚNICAMENTE con un objeto JSON válido. Sin markdown, sin explicaciones antes ni después del JSON.`,
+CRITICAL: Respond ONLY with a valid JSON object. Never use unescaped double quotes inside string values — use \" to escape any quote within text. No markdown, no backticks, no explanation outside the JSON object.`,
           cache_control: { type: 'ephemeral' },
         },
       ],
@@ -513,42 +514,29 @@ Respondes ÚNICAMENTE con un objeto JSON válido. Sin markdown, sin explicacione
       return res.status(500).json({ success: false, error: 'Sin respuesta de texto' });
     }
 
-    // Extraer el bloque JSON incluso si Claude agrega texto antes/después
-    const raw = textBlock.text.trim();
+    // Extraer el bloque JSON — strip markdown fences si Claude las incluyó
+    const raw = textBlock.text.trim()
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/```\s*$/i, '');
+
     const jsonStart = raw.indexOf('{');
     const jsonEnd   = raw.lastIndexOf('}');
     if (jsonStart === -1 || jsonEnd === -1) {
-      console.error('[ClaudeController][generarBrief] No se encontró objeto JSON en la respuesta');
+      console.error('[ClaudeController][generarBrief] Sin objeto JSON en la respuesta');
       return res.status(500).json({ success: false, error: 'Claude no devolvió un objeto JSON. Intenta de nuevo.' });
     }
     const jsonStr = raw.slice(jsonStart, jsonEnd + 1);
 
-    // State machine: escapa saltos de línea literales dentro de strings JSON.
-    // Claude frecuentemente emite newlines reales en valores multi-párrafo,
-    // lo que produce JSON inválido. Esta función los convierte en \n (escape).
-    const fixJsonNewlines = (str) => {
-      let inString = false;
-      let escaped  = false;
-      let out = '';
-      for (let i = 0; i < str.length; i++) {
-        const ch = str[i];
-        if (escaped)          { out += ch; escaped = false; continue; }
-        if (ch === '\\' && inString) { out += ch; escaped = true;  continue; }
-        if (ch === '"')       { inString = !inString; out += ch; continue; }
-        if (inString && ch === '\n') { out += '\\n'; continue; }
-        if (inString && ch === '\r') { continue; }
-        out += ch;
-      }
-      return out;
-    };
-
     try {
-      const brief = JSON.parse(fixJsonNewlines(jsonStr));
+      // jsonrepair corrige comillas sin escapar, comas sobrantes, newlines
+      // literales y otras deformaciones comunes en respuestas de LLMs
+      const brief = JSON.parse(jsonrepair(jsonStr));
       res.json({ success: true, data: brief });
     } catch (parseErr) {
-      console.error('[ClaudeController][generarBrief] JSON.parse falló:', parseErr.message);
-      console.error('[ClaudeController][generarBrief] raw (primeros 500 chars):', jsonStr.slice(0, 500));
-      return res.status(500).json({ success: false, error: 'Claude devolvió JSON malformado. Intenta de nuevo.' });
+      console.error('[ClaudeController][generarBrief] Parse irrecuperable:', parseErr.message);
+      console.error('[ClaudeController][generarBrief] jsonStr[0:500]:', jsonStr.slice(0, 500));
+      return res.status(500).json({ success: false, error: 'Claude devolvió JSON irrecuperable. Intenta de nuevo.' });
     }
   } catch (err) {
     console.error('[ClaudeController][generarBrief]', err.message);

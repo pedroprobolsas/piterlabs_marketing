@@ -11,7 +11,7 @@ export default function MediaUpload({ media, onMediaChange }) {
     const isVideo = file.type.startsWith('video/');
     if (!isImage && !isVideo) return;
     const url = URL.createObjectURL(file);
-    onMediaChange({ url, type: isImage ? 'image' : 'video', name: file.name });
+    onMediaChange({ url, type: isImage ? 'image' : 'video', name: file.name, file });
   };
 
   const handleDrop = (e) => {

@@ -410,3 +410,117 @@ Separa cada formato con una línea: ---`,
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+// ---------------------------------------------------------------
+// POST /api/claude/generar-brief
+// Genera 5 briefs de producción a partir del guion + marca + imagen (opcional)
+// Body: { guion, marca, imagen_base64? }
+// Responde JSON: { foto_publicitaria, carrusel, video_cinematografico, stories, narracion }
+// ---------------------------------------------------------------
+export const generarBrief = async (req, res) => {
+  const { guion, marca, imagen_base64 } = req.body;
+
+  if (!guion || guion.trim().length < 20) {
+    return res.status(400).json({ success: false, error: 'guion es obligatorio (mín. 20 caracteres)' });
+  }
+
+  const client = getClaudeClient();
+
+  // Construir contenido del mensaje — imagen Vision si se proporcionó
+  const userContent = [];
+
+  if (imagen_base64) {
+    const match = imagen_base64.match(/^data:([^;]+);base64,(.+)$/s);
+    if (match) {
+      userContent.push({
+        type: 'image',
+        source: { type: 'base64', media_type: match[1], data: match[2] },
+      });
+    }
+  }
+
+  const marcaCtx = `- Nombre: ${marca?.nombre_marca || 'No especificada'}
+- Industria: ${marca?.industria || ''}
+- Propuesta de valor: ${marca?.propuesta_valor || ''}
+- Tono de voz: ${marca?.tono_voz || 'profesional'}
+- Arquetipos: ${marca?.arquetipos?.length ? marca.arquetipos.join(', ') : 'No definidos'}
+- Buyer persona: ${marca?.buyer_persona?.nombre
+    ? `${marca.buyer_persona.nombre}, ${marca.buyer_persona.ocupacion}. Dolor: ${marca.buyer_persona.dolor_principal}`
+    : 'No definido'}`;
+
+  const imagenNota = imagen_base64
+    ? '\n[IMAGEN ADJUNTA: analiza el producto visible — forma, colores, materiales, contexto de uso]\n'
+    : '';
+
+  userContent.push({
+    type: 'text',
+    text: `Analiza el siguiente guion y contexto de marca para generar 5 briefs de producción completos.
+${imagenNota}
+**GUION:**
+${guion}
+
+**MARCA:**
+${marcaCtx}
+
+Genera un objeto JSON con exactamente 5 campos. Sin markdown, sin texto adicional antes ni después del JSON:
+
+1. "foto_publicitaria": Prompt en inglés para GPT Image 2. Estructura obligatoria: tipo de imagen → descripción del producto → estilo fotográfico → iluminación (física: fuente, dirección, temperatura de color) → composición → texto de marca si aplica → CTA visual. Reglas: escena primero, sujeto segundo, detalles tercero, restricciones al final. Sin adjetivos vacíos (no stunning, no beautiful, no amazing).
+
+2. "carrusel": Estructura completa del carrusel Instagram/LinkedIn. 6-8 slides. Formato por slide: "Slide N: [mensaje principal] | Visual: [instrucción visual] | Diseño: [nota]". Slide 1 = hook más fuerte del guion. Último slide = CTA concreto alineado con el buyer persona.
+
+3. "video_cinematografico": Prompt en 7 bloques obligatorios con etiquetas exactas:
+[01 SCENE SETTING] dónde ocurre, materiales del entorno, hora del día
+[02 SUBJECT DESCRIPTION] solo lo visible: ropa, postura, rasgos. Nunca estados internos
+[03 ACTION/BEHAVIOR] intención + resultado visible. Nunca biomecánica
+[04 SHOT LANGUAGE] vocabulario cinematográfico real: tracking, dolly-in, crane, handheld, OTS
+[05 LIGHTING/ATMOSPHERE] física de la luz: fuente, dirección, temperatura de color, sombras
+[06 STYLE/VISUAL TEXTURE] paleta, grano, estética de referencia
+[07 AUDIO/DIALOGUE] opcional, máx 25 palabras, separado de la acción
+Reglas Seedance: solo lo visible, intención no biomecánica, máx 3 personajes por corte.
+Output BILINGÜE: bloque EN primero, luego mismo bloque traducido a ZH (mandarín).
+
+4. "stories": 3 prompts GPT Image 2 para Stories 9:16 con paleta visual coherente entre ellos. Formato: "STORY 1 — HOOK: [prompt en inglés, formato vertical 9:16]\n\nSTORY 2 — DESARROLLO: [prompt]\n\nSTORY 3 — CTA: [prompt]". Misma temperatura de color y paleta en los 3.
+
+5. "narracion": Objeto con 3 campos — "documental_netflix", "hook_viral_tiktok", "storytelling_emocional". Cada uno es el script limpio de voz en off: sin corchetes, sin instrucciones técnicas, solo el texto que se habla. Reglas: frases máx 10 palabras, párrafos de 1-2 líneas separados por línea en blanco, puntos suspensivos para pausas naturales, primera frase es el gancho, progresión Curiosidad→Tensión→Revelación→Inspiración→CTA. Documental Netflix: grave, pausado, autoridad. Hook Viral TikTok: energía alta, arranque inmediato. Storytelling Emocional: conversacional, construye tensión en primera persona.`,
+  });
+
+  try {
+    const message = await client.messages.create({
+      model: CLAUDE_MODEL,
+      max_tokens: 4500,
+      thinking: { type: 'adaptive' },
+      system: [
+        {
+          type: 'text',
+          text: `Eres un experto en producción de contenido digital para marcas latinoamericanas.
+Dominas los prompts de IA generativa: GPT Image 2, Seedance 2.0, Kling AI, ElevenLabs y CapCut.
+Entiendes semiótica visual, cinematografía y copywriting viral.
+Respondes ÚNICAMENTE con un objeto JSON válido. Sin markdown, sin explicaciones antes ni después del JSON.`,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+      messages: [{ role: 'user', content: userContent }],
+    });
+
+    const textBlock = message.content.find(b => b.type === 'text');
+    if (!textBlock) {
+      return res.status(500).json({ success: false, error: 'Sin respuesta de texto' });
+    }
+
+    // Extraer JSON incluso si Claude agrega texto antes/después
+    const raw = textBlock.text.trim();
+    const jsonStart = raw.indexOf('{');
+    const jsonEnd   = raw.lastIndexOf('}');
+    const jsonStr   = jsonStart !== -1 && jsonEnd !== -1 ? raw.slice(jsonStart, jsonEnd + 1) : raw;
+
+    try {
+      const brief = JSON.parse(jsonStr);
+      res.json({ success: true, data: brief });
+    } catch {
+      res.json({ success: true, data: null, raw });
+    }
+  } catch (err) {
+    console.error('[ClaudeController][generarBrief]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

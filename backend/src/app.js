@@ -10,7 +10,7 @@ const app = express();
 
 // Middlewares
 app.use(cors());
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '10mb' })); // base64 images para Claude Vision
 
 // Routes
 app.use('/api/clientes', clientesRoutes);

@@ -40,8 +40,8 @@ export default function MainLayout() {
         />
       )}
 
-      {/* Main content — margin-left matches sidebar width on desktop */}
-      <div className="ml-0 md:ml-[252px] flex flex-col h-full overflow-hidden">
+      {/* Main content — .sidebar-offset defined in index.css (Tailwind responsive arbitrary values unreliable) */}
+      <div className="sidebar-offset">
         <Topbar title={title} subtitle={subtitle} toggleSidebar={() => setSidebarOpen(prev => !prev)} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-[20px_16px] md:p-[30px_36px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
           <Outlet />

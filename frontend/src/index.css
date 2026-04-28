@@ -68,6 +68,20 @@ body {
   color: var(--color-muted);
 }
 
+/* Main layout — content area pushed right of the fixed sidebar on desktop */
+.sidebar-offset {
+  margin-left: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .sidebar-offset {
+    margin-left: 252px;
+  }
+}
+
 /* Parallax CSS fallback — used when deviceorientation is unavailable on mobile */
 @keyframes parallax-float {
   0%   { transform: translate(0px, 0px) scale(1.06); }

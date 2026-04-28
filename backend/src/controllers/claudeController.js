@@ -491,6 +491,14 @@ Genera un objeto JSON con exactamente ${skills.length} campo${skills.length > 1 
 ${skillsPrompt}`,
   });
 
+  // Construir instrucciones dinámicas de estructura para el System Prompt
+  const jsonSchema = skills.map(s => {
+    if (s.clave === 'narracion') {
+      return `- ${s.clave}: objeto con 3 claves: netflix, tiktok, emocional (cada una string)`;
+    }
+    return `- ${s.clave}: string`;
+  }).join('\n');
+
   try {
     const message = await client.messages.create({
       model: CLAUDE_MODEL,
@@ -501,12 +509,8 @@ ${skillsPrompt}`,
           text: `Eres un experto en producción de contenido para redes sociales.
 REGLA ABSOLUTA: Responde ÚNICAMENTE con un objeto JSON válido.
 Sin texto antes. Sin texto después. Sin markdown. Sin backticks. Sin explicaciones.
-El JSON debe tener exactamente estas 5 claves:
-- foto_publicitaria: string
-- carrusel: string
-- video_cinematografico: string
-- stories: string
-- narracion: objeto con 3 claves: netflix, tiktok, emocional (cada una string)
+El JSON debe tener exactamente estas ${skills.length} claves:
+${jsonSchema}
 Dentro de los strings, nunca uses comillas dobles. Usa comillas simples si necesitas citar algo.`,
           cache_control: { type: 'ephemeral' },
         },

@@ -12,6 +12,8 @@ function SkillCard({ skill, onSave }) {
     descripcion:   skill.descripcion || '',
     instrucciones: skill.instrucciones,
     activa:        skill.activa,
+    label_tab:     skill.label_tab || '',
+    titulo_panel:  skill.titulo_panel || '',
   });
 
   // Sync form if parent skill changes (e.g. after toggle save)
@@ -21,6 +23,8 @@ function SkillCard({ skill, onSave }) {
       descripcion:   skill.descripcion || '',
       instrucciones: skill.instrucciones,
       activa:        skill.activa,
+      label_tab:     skill.label_tab || '',
+      titulo_panel:  skill.titulo_panel || '',
     });
   }, [skill]);
 
@@ -124,6 +128,27 @@ function SkillCard({ skill, onSave }) {
                 onChange={e => setForm(p => ({ ...p, descripcion: e.target.value }))}
                 className="input-base text-[0.75rem]"
                 placeholder="Visible en el panel de Skills"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[12px]">
+            <div>
+              <label className="font-jetbrains text-[0.62rem] text-text2 uppercase tracking-[1.5px] font-bold block mb-[6px]">Label Pestaña (Brief)</label>
+              <input
+                value={form.label_tab}
+                onChange={e => setForm(p => ({ ...p, label_tab: e.target.value }))}
+                className="input-base text-[0.75rem]"
+                placeholder="Ej: 📸 Foto"
+              />
+            </div>
+            <div>
+              <label className="font-jetbrains text-[0.62rem] text-text2 uppercase tracking-[1.5px] font-bold block mb-[6px]">Título Panel (Brief)</label>
+              <input
+                value={form.titulo_panel}
+                onChange={e => setForm(p => ({ ...p, titulo_panel: e.target.value }))}
+                className="input-base text-[0.75rem]"
+                placeholder="Ej: Foto Publicitaria — GPT Image 2"
               />
             </div>
           </div>

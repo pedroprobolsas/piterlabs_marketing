@@ -4,7 +4,7 @@ import pool from '../db/pool.js';
 export const getSkills = async (_req, res) => {
   try {
     const { rows } = await pool.query(
-      'SELECT id, clave, nombre, descripcion, instrucciones, activa, orden, updated_at FROM marketing.skills ORDER BY orden'
+      'SELECT id, clave, nombre, descripcion, instrucciones, activa, orden, label_tab, titulo_panel, updated_at FROM marketing.skills ORDER BY orden'
     );
     res.json({ success: true, data: rows });
   } catch (err) {
@@ -13,10 +13,10 @@ export const getSkills = async (_req, res) => {
   }
 };
 
-// PUT /api/skills/:id — actualizar nombre, descripcion, instrucciones, activa
+// PUT /api/skills/:id — actualizar nombre, descripcion, instrucciones, activa, label_tab, titulo_panel
 export const updateSkill = async (req, res) => {
   const { id } = req.params;
-  const { nombre, descripcion, instrucciones, activa } = req.body;
+  const { nombre, descripcion, instrucciones, activa, label_tab, titulo_panel } = req.body;
 
   if (!nombre?.trim() || !instrucciones?.trim()) {
     return res.status(400).json({ success: false, error: 'nombre e instrucciones son obligatorios' });
@@ -25,10 +25,18 @@ export const updateSkill = async (req, res) => {
   try {
     const { rows } = await pool.query(
       `UPDATE marketing.skills
-       SET nombre = $1, descripcion = $2, instrucciones = $3, activa = $4
-       WHERE id = $5
-       RETURNING id, clave, nombre, descripcion, instrucciones, activa, orden, updated_at`,
-      [nombre.trim(), descripcion?.trim() ?? '', instrucciones.trim(), activa ?? true, id]
+       SET nombre = $1, descripcion = $2, instrucciones = $3, activa = $4, label_tab = $5, titulo_panel = $6
+       WHERE id = $7
+       RETURNING id, clave, nombre, descripcion, instrucciones, activa, orden, label_tab, titulo_panel, updated_at`,
+      [
+        nombre.trim(), 
+        descripcion?.trim() ?? '', 
+        instrucciones.trim(), 
+        activa ?? true, 
+        label_tab?.trim() ?? '', 
+        titulo_panel?.trim() ?? '', 
+        id
+      ]
     );
 
     if (rows.length === 0) {

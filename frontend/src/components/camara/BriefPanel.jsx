@@ -1,13 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles, Copy, Check, FileText, RefreshCw } from 'lucide-react';
-
-const TABS = [
-  { id: 'foto_publicitaria',    label: '📸 Foto',    title: 'Foto Publicitaria — GPT Image 2',           desc: 'Pega este prompt en ChatGPT Plus (GPT Image 2) junto con la foto de tu producto. Genera una pieza publicitaria profesional lista para Instagram o Facebook.' },
-  { id: 'carrusel',             label: '🎠 Carrusel', title: 'Carrusel Educativo — Instagram / LinkedIn',  desc: 'Usa esta estructura en Canva o con GPT Image 2. Cada slide tiene el texto y el prompt de imagen correspondiente. Ideal para Instagram y LinkedIn.' },
-  { id: 'video_cinematografico',label: '🎬 Video',   title: 'Video Cinematográfico — Seedance / Kling',   desc: 'Pega este prompt en Seedance 2.0 (via Artlist) o Kling. Incluye versión en inglés y chino nativo para mejor resultado. Genera video cinematográfico de 15-60 segundos.' },
-  { id: 'stories',              label: '📱 Stories', title: 'Stories Secuenciales 9:16',                  desc: 'Pega cada prompt por separado en ChatGPT Plus (GPT Image 2). Genera 3 stories verticales 9:16 con coherencia visual entre ellas para Instagram o TikTok.' },
-  { id: 'narracion',            label: '🎙️ Narración',title: 'Narración Viral — ElevenLabs / CapCut',      desc: 'Copia el estilo que prefieras y pégalo en ElevenLabs o en el generador de voz de CapCut. Script limpio listo para usar — sin editar.' },
-];
 
 const NAR_STYLES = [
   { id: 'netflix',   label: 'Documental Netflix' },
@@ -41,12 +33,27 @@ function CopyButton({ text }) {
 }
 
 export default function BriefPanel({ marca, mediaFile }) {
-  const [guion, setGuion]   = useState('');
-  const [loading, setLoading] = useState(false);
-  const [brief, setBrief]   = useState(null);
-  const [error, setError]   = useState('');
-  const [activeTab, setActiveTab]     = useState('foto_publicitaria');
-  const [activeNar, setActiveNar]     = useState('netflix');
+  const [guion, setGuion]     = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [brief, setBrief]       = useState(null);
+  const [error, setError]       = useState('');
+  const [skills, setSkills]     = useState([]);
+  const [activeTab, setActiveTab] = useState('');
+  const [activeNar, setActiveNar] = useState('netflix');
+
+  // Cargar skills activas para construir la interfaz
+  useEffect(() => {
+    fetch('/api/skills')
+      .then(r => r.json())
+      .then(json => {
+        if (json.success) {
+          const active = json.data.filter(s => s.activa);
+          setSkills(active);
+          if (active.length > 0) setActiveTab(active[0].clave);
+        }
+      })
+      .catch(err => console.error('[BriefPanel] Error fetching skills:', err.message));
+  }, []);
 
   const handleGenerar = async () => {
     if (guion.trim().length < 20) {
@@ -98,6 +105,8 @@ export default function BriefPanel({ marca, mediaFile }) {
     return brief[activeTab] || '';
   };
 
+  const activeSkill = skills.find(s => s.clave === activeTab);
+
   return (
     <div className="bg-white border border-border rounded-[14px] flex flex-col">
 
@@ -106,7 +115,9 @@ export default function BriefPanel({ marca, mediaFile }) {
         <div className="flex items-center gap-[8px]">
           <FileText size={15} className="text-magenta" />
           <span className="font-bebas text-[1.1rem] tracking-[2px] text-text-main">BRIEF DE PRODUCCIÓN</span>
-          <span className="font-jetbrains text-[0.55rem] text-muted bg-surface border border-border rounded-full px-[8px] py-[2px]">5 SKILLS</span>
+          <span className="font-jetbrains text-[0.55rem] text-muted bg-surface border border-border rounded-full px-[8px] py-[2px]">
+            {skills.length} SKILLS
+          </span>
         </div>
         {brief && (
           <span className="font-jetbrains text-[0.58rem] text-green bg-green/10 border border-green/20 rounded-full px-[8px] py-[2px]">
@@ -139,7 +150,7 @@ export default function BriefPanel({ marca, mediaFile }) {
         {/* Generate button */}
         <button
           onClick={handleGenerar}
-          disabled={loading || guion.trim().length < 20}
+          disabled={loading || guion.trim().length < 20 || skills.length === 0}
           className="w-full flex items-center justify-center gap-[8px] bg-magenta text-white font-bebas text-[1.1rem] tracking-[2px] px-[20px] py-[12px] rounded-[10px] cursor-pointer hover:bg-magenta-bright transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(204,0,204,0.2)]"
         >
           {loading
@@ -157,9 +168,9 @@ export default function BriefPanel({ marca, mediaFile }) {
         {loading && (
           <div className="space-y-[8px] pt-[4px]">
             <div className="font-jetbrains text-[0.62rem] text-muted text-center">
-              Claude está analizando el guion y generando los 5 briefs…
+              Claude está analizando el guion y generando los {skills.length} briefs…
             </div>
-            {[80, 60, 90, 70, 75].map((w, i) => (
+            {[80, 60, 90, 70, 75].slice(0, skills.length).map((w, i) => (
               <div key={i} className="h-[8px] bg-border rounded-full animate-pulse" style={{ width: `${w}%` }} />
             ))}
           </div>
@@ -171,16 +182,16 @@ export default function BriefPanel({ marca, mediaFile }) {
 
             {/* Main tabs */}
             <div className="flex border-b border-border-soft overflow-x-auto scrollbar-thin">
-              {TABS.map(tab => (
+              {skills.map(tab => (
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  key={tab.clave}
+                  onClick={() => setActiveTab(tab.clave)}
                   className={`px-[14px] py-[10px] font-jetbrains text-[0.62rem] whitespace-nowrap transition-all cursor-pointer border-b-[2px] shrink-0
-                    ${activeTab === tab.id
+                    ${activeTab === tab.clave
                       ? 'border-magenta text-magenta bg-magenta-soft'
                       : 'border-transparent text-muted hover:text-text2'}`}
                 >
-                  {tab.label}
+                  {tab.label_tab || tab.nombre}
                 </button>
               ))}
             </div>
@@ -189,10 +200,10 @@ export default function BriefPanel({ marca, mediaFile }) {
             <div className="flex items-start justify-between px-[14px] py-[10px] border-b border-border-soft bg-bg-soft gap-[8px]">
               <div className="flex flex-col gap-[3px] min-w-0">
                 <span className="font-jetbrains text-[0.62rem] text-text2 font-bold">
-                  {TABS.find(t => t.id === activeTab)?.title}
+                  {activeSkill?.titulo_panel || activeSkill?.nombre}
                 </span>
                 <span className="font-jetbrains text-[0.58rem] text-muted leading-snug">
-                  {TABS.find(t => t.id === activeTab)?.desc}
+                  {activeSkill?.descripcion}
                 </span>
               </div>
               <CopyButton text={getTabContent()} />

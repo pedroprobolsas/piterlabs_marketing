@@ -1,4 +1,4 @@
-import { Brain, PenTool, Video, Zap, RefreshCw, Send, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react';
+import { Brain, PenTool, Video, Zap, RefreshCw, Send, ArrowUp, ArrowDown, ExternalLink, Lightbulb } from 'lucide-react';
 import HeroBanner from '../../components/dashboard/HeroBanner';
 
 export default function Dashboard() {
@@ -43,15 +43,16 @@ export default function Dashboard() {
       {/* BLOQUES PIPELINE */}
       <h3 className="font-jetbrains text-[0.7rem] text-text2 uppercase tracking-[2px] mb-[12px] font-bold">PIPELINE DE PRODUCCIÓN</h3>
       <div className="flex gap-[10px] mb-[24px] overflow-x-auto pb-[8px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent snap-x">
-        {[{num: 'B.1', name: 'MI MARCA', sub: 'Estrategia', active: false, Icon: Brain },
-          {num: 'B.2', name: 'CREAR GUION', sub: 'Narrativa', active: true, Icon: PenTool },
-          {num: 'B.3', name: 'PRODUCIR VIDEO', sub: 'Producción', active: false, Icon: Video },
-          {num: 'B.4', name: 'VIRALIZAR', sub: 'Impacto', active: false, Icon: Zap },
-          {num: 'B.5', name: 'PUBLICAR Y MEDIR', sub: 'Conversión', active: false, Icon: RefreshCw }]
+        {[{num: '1', name: 'MI MARCA', sub: 'Estrategia', active: false, Icon: Brain },
+          {num: '2', name: 'MÁQUINA DE IDEAS', sub: 'Ideación', active: false, Icon: Lightbulb },
+          {num: '3', name: 'CREAR GUION', sub: 'Narrativa', active: true, Icon: PenTool },
+          {num: '4', name: 'PRODUCIR VIDEO', sub: 'Producción', active: false, Icon: Video },
+          {num: '5', name: 'VIRALIZAR', sub: 'Impacto', active: false, Icon: Zap },
+          {num: '6', name: 'PUBLICAR Y MEDIR', sub: 'Conversión', active: false, Icon: RefreshCw }]
           .map((b, i) => (
           <div key={b.num} className={`flex-none w-[160px] md:flex-1 md:w-auto bg-white border-[1.5px] rounded-[12px] p-[16px_14px] text-center cursor-pointer transition-all duration-250 relative overflow-hidden snap-center
             ${b.active ? 'border-magenta bg-magenta-soft shadow-[0_4px_20px_rgba(204,0,204,0.12)]' : 'border-border hover:border-magenta hover:shadow-[0_4px_16px_rgba(204,0,204,0.07)]'}
-            ${i !== 4 ? `after:content-['›'] after:absolute after:right-[4px] md:after:right-[-6px] after:top-[50%] after:-translate-y-1/2 after:text-border after:text-[1.2rem] after:font-light after:z-10` : ''}`}>
+            ${i !== 5 ? `after:content-['›'] after:absolute after:right-[4px] md:after:right-[-6px] after:top-[50%] after:-translate-y-1/2 after:text-border after:text-[1.2rem] after:font-light after:z-10` : ''}`}>
              <b.Icon className="mx-auto mb-[7px]" size={24} color={b.active ? '#cc00cc' : '#3a3a4a'} />
              <span className="font-jetbrains text-[0.56rem] text-magenta mb-[5px] block uppercase tracking-[1px]">{b.num}</span>
              <span className="font-bebas text-[0.9rem] tracking-[1.5px] text-text-main block">{b.name}</span>

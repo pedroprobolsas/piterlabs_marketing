@@ -14,11 +14,13 @@ export default function MainLayout() {
       case '/clientes':
         return { title: 'MIS CLIENTES', subtitle: 'PostgreSQL Sync via Crisolweb' };
       case '/cerebro':
-        return { title: 'B.1 — MI MARCA', subtitle: 'Identidad, Arquetipos y Buyer Persona' };
+        return { title: 'MI MARCA', subtitle: 'Identidad, Arquetipos y Buyer Persona' };
+      case '/ideas':
+        return { title: 'MÁQUINA DE IDEAS', subtitle: 'Generación y Estrategia de Temas' };
       case '/pluma':
-        return { title: 'B.2 — CREAR GUION', subtitle: 'Narrativa y Producción de Contenido' };
+        return { title: 'CREAR GUION', subtitle: 'Narrativa y Producción de Contenido' };
       case '/camara':
-        return { title: 'B.3 — PRODUCIR VIDEO', subtitle: 'Frame, Skills y Preview 9:16' };
+        return { title: 'PRODUCIR VIDEO', subtitle: 'Frame, Skills y Preview 9:16' };
       case '/skills':
         return { title: 'GESTIÓN DE SKILLS', subtitle: 'Instrucciones de producción para Claude' };
       default:

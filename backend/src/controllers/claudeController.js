@@ -223,6 +223,109 @@ Escala puntuación: 0-49 débil, 50-74 regular, 75-89 fuerte, 90-100 viral`,
 };
 
 // ---------------------------------------------------------------
+// POST /api/claude/generar-ideas
+// Genera temas estructurados usando el prompt del Estratega Senior
+// Body: { objetivo, canal, etapa_cliente, cantidad, marca_config }
+// ---------------------------------------------------------------
+export const generarIdeas = async (req, res) => {
+  const { objetivo, canal, etapa_cliente, cantidad, marca_config } = req.body;
+
+  if (!objetivo || !canal) {
+    return res.status(400).json({ success: false, error: 'objetivo y canal son obligatorios' });
+  }
+
+  const client = getClaudeClient();
+
+  try {
+    const stream = client.messages.stream({
+      model: CLAUDE_MODEL,
+      max_tokens: 3000,
+      thinking: { type: 'adaptive' },
+      system: [
+        {
+          type: 'text',
+          text: `Actúa como estratega senior de contenido, especialista en marketing, ventas, storytelling y generación de demanda.
+Tu tarea es generar temas de contenido para una empresa según su industria, producto, audiencia y objetivo comercial.`,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: `Genera temas organizados.
+
+Datos de entrada:
+- Tipo de empresa / Industria: ${marca_config?.industria || 'No especificada'}
+- Producto o servicio: ${marca_config?.propuesta_valor || 'No especificado'}
+- Público objetivo: ${marca_config?.buyer_persona ? `${marca_config.buyer_persona.nombre}, ${marca_config.buyer_persona.ocupacion}. Dolor: ${marca_config.buyer_persona.dolor_principal}` : 'No definido'}
+- Objetivo del contenido: ${objetivo}
+- Canal principal: ${canal}
+- Tono de marca: ${marca_config?.tono_voz || 'Profesional'}
+- Etapa del cliente: ${etapa_cliente || 'No especificada'}
+- Cantidad de temas: ${cantidad || 10}
+
+Genera temas organizados en estas categorías (si aplican a la cantidad solicitada):
+1. Dolor del cliente
+2. Deseo del cliente
+3. Errores comunes
+4. Mitos
+5. Comparativas
+6. Educación
+7. Objeciones
+8. Autoridad
+9. Casos de uso
+10. Conversión
+
+Para cada tema entrega:
+- Tema
+- Hook sugerido
+- Idea central
+- Categoría
+- Formato recomendado
+- Canal recomendado
+- CTA sugerido
+- Nivel de intención comercial (baja, media o alta)
+- Potencial viral (bajo, medio o alto)
+- Nivel de dificultad para producir (bajo, medio o alto)
+
+Reglas:
+- No generes temas genéricos.
+- Cada tema debe conectar con un dolor, deseo, objeción o meta real del público.
+- Prioriza temas que puedan convertirse en guion, video, carrusel, email o anuncio.
+- Usa lenguaje claro, directo y comercial en español latino.
+- Si el canal es TikTok o Reels, prioriza hooks fuertes y retención.
+- Si el canal es LinkedIn, prioriza autoridad, negocio y opinión.
+- Si el canal es email, prioriza profundidad y conversión.
+- Entrégalo formateado en Markdown claro, usando viñetas o tablas legibles. No incluyas intros ni saludos largos.`,
+        },
+      ],
+    });
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    stream.on('text', (text) => {
+      res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`);
+    });
+
+    stream.on('finalMessage', () => {
+      res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+      res.end();
+    });
+
+    stream.on('error', (err) => {
+      console.error('[ClaudeController][generarIdeas]', err.message);
+      res.write(`data: ${JSON.stringify({ type: 'error', error: err.message })}\n\n`);
+      res.end();
+    });
+  } catch (err) {
+    console.error('[ClaudeController][generarIdeas] Init error', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// ---------------------------------------------------------------
 // POST /api/claude/generar-guion
 // Genera un guion completo para un formato de contenido
 // Body: { plantilla, tema, marca_config, buyer_persona }

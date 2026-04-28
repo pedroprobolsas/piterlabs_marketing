@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import MisClientes from './pages/Clientes/MisClientes';
 import Prospectos from './pages/Prospectos/Prospectos';
 import MiMarca from './pages/Cerebro/MiMarca';
+import Ideacion from './pages/Cerebro/Ideacion';
 import CrearGuion from './pages/Pluma/CrearGuion';
 import ProducirVideo from './pages/Camara/ProducirVideo';
 import GestionSkills from './pages/Skills/GestionSkills';
@@ -17,6 +18,7 @@ function App() {
           <Route path="clientes"  element={<MisClientes />} />
           <Route path="prospectos" element={<Prospectos />} />
           <Route path="cerebro"   element={<MiMarca />} />
+          <Route path="ideas"     element={<Ideacion />} />
           <Route path="pluma"     element={<CrearGuion />} />
           <Route path="camara"    element={<ProducirVideo />} />
           <Route path="rayo"      element={<ComingSoon title="VIRALIZAR" />} />

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Sparkles, Brain, PenTool, Video, Zap, RefreshCw, LayoutDashboard, Users, UserPlus, Mail, Settings, Wand2 } from 'lucide-react';
+import { Sparkles, Brain, Lightbulb, PenTool, Video, Zap, RefreshCw, LayoutDashboard, Users, UserPlus, Mail, Settings, Wand2 } from 'lucide-react';
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   return (
@@ -36,23 +36,27 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         
         <NavLink to="/cerebro" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <Brain size={16} className="min-w-[20px]" />
-          <span>1. Mi Marca</span>
+          <span>Mi Marca</span>
+        </NavLink>
+        <NavLink to="/ideas" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
+          <Lightbulb size={16} className="min-w-[20px]" />
+          <span>Máquina de Ideas</span>
         </NavLink>
         <NavLink to="/pluma" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <PenTool size={16} className="min-w-[20px]" />
-          <span>2. Crear Guion</span>
+          <span>Crear Guion</span>
         </NavLink>
         <NavLink to="/camara" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <Video size={16} className="min-w-[20px]" />
-          <span>3. Producir Video</span>
+          <span>Producir Video</span>
         </NavLink>
         <NavLink to="/rayo" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <Zap size={16} className="min-w-[20px]" />
-          <span>4. Viralizar</span>
+          <span>Viralizar</span>
         </NavLink>
         <NavLink to="/engranaje" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <RefreshCw size={16} className="min-w-[20px]" />
-          <span>5. Publicar y Medir</span>
+          <span>Publicar y Medir</span>
         </NavLink>
 
         <hr className="border-t border-border-soft my-[8px] mx-0" />

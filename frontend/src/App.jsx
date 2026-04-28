@@ -5,6 +5,7 @@ import MisClientes from './pages/Clientes/MisClientes';
 import Prospectos from './pages/Prospectos/Prospectos';
 import MiMarca from './pages/Cerebro/MiMarca';
 import CrearGuion from './pages/Pluma/CrearGuion';
+import ProducirVideo from './pages/Camara/ProducirVideo';
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
           <Route path="prospectos" element={<Prospectos />} />
           <Route path="cerebro"   element={<MiMarca />} />
           <Route path="pluma"     element={<CrearGuion />} />
-          <Route path="camara"    element={<ComingSoon title="PRODUCIR VIDEO" />} />
+          <Route path="camara"    element={<ProducirVideo />} />
           <Route path="rayo"      element={<ComingSoon title="VIRALIZAR" />} />
           <Route path="engranaje" element={<ComingSoon title="PUBLICAR Y MEDIR" />} />
           <Route path="email"     element={<ComingSoon title="EMAIL MARKETING" />} />

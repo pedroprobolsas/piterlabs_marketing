@@ -17,6 +17,8 @@ export default function MainLayout() {
         return { title: 'B.1 — MI MARCA', subtitle: 'Identidad, Arquetipos y Buyer Persona' };
       case '/pluma':
         return { title: 'B.2 — CREAR GUION', subtitle: 'Narrativa y Producción de Contenido' };
+      case '/camara':
+        return { title: 'B.3 — PRODUCIR VIDEO', subtitle: 'Frame, Skills y Preview 9:16' };
       default:
         return { title: 'PITERLABS', subtitle: 'Dashboard' };
     }
@@ -25,10 +27,7 @@ export default function MainLayout() {
   const { title, subtitle } = getPageInfo();
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden bg-bg">
-
-      {/* Spacer — desktop only: reserves 252px so content doesn't go under the fixed sidebar */}
-      <div className="w-0 md:w-[252px] shrink-0" />
+    <div className="h-[100dvh] overflow-hidden bg-bg">
 
       {/* Sidebar — always fixed */}
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
@@ -41,8 +40,8 @@ export default function MainLayout() {
         />
       )}
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+      {/* Main content — margin-left matches sidebar width on desktop */}
+      <div className="ml-0 md:ml-[252px] flex flex-col h-full overflow-hidden">
         <Topbar title={title} subtitle={subtitle} toggleSidebar={() => setSidebarOpen(prev => !prev)} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto p-[20px_16px] md:p-[30px_36px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
           <Outlet />

@@ -17,6 +17,16 @@ export default function CrearGuion() {
   const [activeSection, setActiveSection] = useState('guion'); // 'guion' | 'formatos'
   const guionRef = useRef(null);
 
+  // Cargar idea reciente de la Máquina de Ideas si existe
+  useEffect(() => {
+    const recentIdea = localStorage.getItem('piterlabs_ideas_recientes');
+    if (recentIdea) {
+      setTema(recentIdea);
+      // Lo borramos para que no aparezca siempre
+      localStorage.removeItem('piterlabs_ideas_recientes');
+    }
+  }, []);
+
   // Guardar en localStorage cuando se termina de generar
   useEffect(() => {
     if (!generando && guion) {
@@ -101,21 +111,21 @@ export default function CrearGuion() {
           {/* Tema + Generate */}
           <div className="bg-white border border-border rounded-[14px] p-[20px_22px]">
             <label className="font-jetbrains text-[0.7rem] text-text2 uppercase tracking-[1.5px] font-bold block mb-[8px]">
-              Tema del Contenido <span className="text-magenta">*</span>
+              Tema del Contenido o Contexto Estratégico <span className="text-magenta">*</span>
             </label>
-            <div className="flex gap-[10px]">
-              <input
+            <div className="flex flex-col gap-[10px]">
+              <textarea
                 value={tema}
                 onChange={e => setTema(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleGenerarGuion()}
-                placeholder="Ej: Cómo elegir el empaque correcto para tu producto"
-                className="input-base flex-1"
+                placeholder="Ej: Cómo elegir el empaque correcto para tu producto. (Puedes pegar aquí el resultado completo de la Máquina de Ideas)"
+                className="input-base w-full min-h-[120px] resize-y font-jetbrains text-[0.8rem]"
               />
-              <button
-                onClick={handleGenerarGuion}
-                disabled={generando || !tema.trim()}
-                className="flex items-center gap-[7px] bg-magenta text-white font-bebas text-[1rem] tracking-[1.5px] px-[20px] py-[10px] rounded-[9px] cursor-pointer hover:bg-magenta-bright transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(204,0,204,0.2)] shrink-0"
-              >
+              <div className="flex justify-end">
+                <button
+                  onClick={handleGenerarGuion}
+                  disabled={generando || !tema.trim()}
+                  className="flex items-center gap-[7px] bg-magenta text-white font-bebas text-[1rem] tracking-[1.5px] px-[20px] py-[10px] rounded-[9px] cursor-pointer hover:bg-magenta-bright transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(204,0,204,0.2)]"
+                >
                 {generando
                   ? <><RefreshCw size={15} className="animate-spin" /> GENERANDO</>
                   : <><Sparkles size={15} /> GENERAR</>}

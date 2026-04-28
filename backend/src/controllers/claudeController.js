@@ -513,17 +513,42 @@ Respondes ÚNICAMENTE con un objeto JSON válido. Sin markdown, sin explicacione
       return res.status(500).json({ success: false, error: 'Sin respuesta de texto' });
     }
 
-    // Extraer JSON incluso si Claude agrega texto antes/después
+    // Extraer el bloque JSON incluso si Claude agrega texto antes/después
     const raw = textBlock.text.trim();
     const jsonStart = raw.indexOf('{');
     const jsonEnd   = raw.lastIndexOf('}');
-    const jsonStr   = jsonStart !== -1 && jsonEnd !== -1 ? raw.slice(jsonStart, jsonEnd + 1) : raw;
+    if (jsonStart === -1 || jsonEnd === -1) {
+      console.error('[ClaudeController][generarBrief] No se encontró objeto JSON en la respuesta');
+      return res.status(500).json({ success: false, error: 'Claude no devolvió un objeto JSON. Intenta de nuevo.' });
+    }
+    const jsonStr = raw.slice(jsonStart, jsonEnd + 1);
+
+    // State machine: escapa saltos de línea literales dentro de strings JSON.
+    // Claude frecuentemente emite newlines reales en valores multi-párrafo,
+    // lo que produce JSON inválido. Esta función los convierte en \n (escape).
+    const fixJsonNewlines = (str) => {
+      let inString = false;
+      let escaped  = false;
+      let out = '';
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        if (escaped)          { out += ch; escaped = false; continue; }
+        if (ch === '\\' && inString) { out += ch; escaped = true;  continue; }
+        if (ch === '"')       { inString = !inString; out += ch; continue; }
+        if (inString && ch === '\n') { out += '\\n'; continue; }
+        if (inString && ch === '\r') { continue; }
+        out += ch;
+      }
+      return out;
+    };
 
     try {
-      const brief = JSON.parse(jsonStr);
+      const brief = JSON.parse(fixJsonNewlines(jsonStr));
       res.json({ success: true, data: brief });
-    } catch {
-      res.json({ success: true, data: null, raw });
+    } catch (parseErr) {
+      console.error('[ClaudeController][generarBrief] JSON.parse falló:', parseErr.message);
+      console.error('[ClaudeController][generarBrief] raw (primeros 500 chars):', jsonStr.slice(0, 500));
+      return res.status(500).json({ success: false, error: 'Claude devolvió JSON malformado. Intenta de nuevo.' });
     }
   } catch (err) {
     console.error('[ClaudeController][generarBrief]', err.message);

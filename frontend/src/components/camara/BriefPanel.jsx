@@ -157,7 +157,7 @@ export default function BriefPanel({ marca, mediaFile }) {
         {/* Generate button */}
         <button
           onClick={handleGenerar}
-          disabled={loading || guion.trim().length < 20 || skills.length === 0}
+          disabled={loading || guion.trim().length < 20}
           className="w-full flex items-center justify-center gap-[8px] bg-magenta text-white font-bebas text-[1.1rem] tracking-[2px] px-[20px] py-[12px] rounded-[10px] cursor-pointer hover:bg-magenta-bright transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(204,0,204,0.2)]"
         >
           {loading

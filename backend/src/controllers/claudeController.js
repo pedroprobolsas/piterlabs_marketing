@@ -336,7 +336,7 @@ export const adaptarFormatos = async (req, res) => {
   try {
     const message = await client.messages.create({
       model: CLAUDE_MODELS.PRINCIPAL,
-      max_tokens: 3000,
+      max_tokens: 8000,
       thinking: { type: 'adaptive' },
       system: [
         {

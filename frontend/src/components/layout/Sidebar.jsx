@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Sparkles, Brain, Lightbulb, Target, PenTool, Video, Zap, RefreshCw, LayoutDashboard, Users, UserPlus, Mail, Settings, Wand2 } from 'lucide-react';
+import { Sparkles, Brain, Target, PenTool, Video, Zap, RefreshCw, LayoutDashboard, Users, UserPlus, Mail, Settings, Wand2, Lock } from 'lucide-react';
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   return (
@@ -50,14 +50,16 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           <Video size={16} className="min-w-[20px]" />
           <span>Producir Video</span>
         </NavLink>
-        <NavLink to="/rayo" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
+        <div className="flex items-center gap-[11px] px-[22px] py-[10px] text-[0.9rem] font-semibold text-muted/40 cursor-default select-none">
           <Zap size={16} className="min-w-[20px]" />
           <span>Viralizar</span>
-        </NavLink>
-        <NavLink to="/engranaje" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
+          <span className="ml-auto font-jetbrains text-[0.5rem] px-[6px] py-[1px] rounded-[4px] bg-surface border border-border text-muted/50 uppercase tracking-[1px]">Pronto</span>
+        </div>
+        <div className="flex items-center gap-[11px] px-[22px] py-[10px] text-[0.9rem] font-semibold text-muted/40 cursor-default select-none">
           <RefreshCw size={16} className="min-w-[20px]" />
           <span>Publicar y Medir</span>
-        </NavLink>
+          <span className="ml-auto font-jetbrains text-[0.5rem] px-[6px] py-[1px] rounded-[4px] bg-surface border border-border text-muted/50 uppercase tracking-[1px]">Pronto</span>
+        </div>
 
         <hr className="border-t border-border-soft my-[8px] mx-0" />
 
@@ -78,10 +80,11 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           <span>Prospectos</span>
           <div className="ml-auto font-jetbrains text-[0.58rem] px-[8px] py-[2px] rounded-[10px] bg-magenta-soft text-magenta border border-magenta/20 font-medium">12</div>
         </NavLink>
-        <NavLink to="/email" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
+        <div className="flex items-center gap-[11px] px-[22px] py-[10px] text-[0.9rem] font-semibold text-muted/40 cursor-default select-none">
           <Mail size={16} className="min-w-[20px]" />
           <span>Email Mkt</span>
-        </NavLink>
+          <span className="ml-auto font-jetbrains text-[0.5rem] px-[6px] py-[1px] rounded-[4px] bg-surface border border-border text-muted/50 uppercase tracking-[1px]">Pronto</span>
+        </div>
         
         <hr className="border-t border-border-soft my-[8px] mx-0" />
         

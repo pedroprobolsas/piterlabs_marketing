@@ -497,6 +497,9 @@ ${skillsPrompt}`,
     if (s.clave === 'narracion') {
       return `- ${s.clave}: objeto con 3 claves: netflix, tiktok, emocional (cada una string)`;
     }
+    if (s.clave === 'guion_grafico') {
+      return `- ${s.clave}: string (desglose completo de todas las escenas en un solo bloque de texto, separadas por saltos de línea)`;
+    }
     return `- ${s.clave}: string`;
   }).join('\n');
 

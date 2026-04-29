@@ -423,10 +423,10 @@ Separa cada formato con una línea: ---`,
 // POST /api/claude/generar-brief
 // Genera briefs de producción a partir del guion + marca + imagen (opcional)
 // Las instrucciones de cada skill se leen de marketing.skills (activas)
-// Body: { guion, marca, imagen_base64? }
+// Body: { guion, marca, imagen_base64?, estilo_cinematografico? }
 // ---------------------------------------------------------------
 export const generarBrief = async (req, res) => {
-  const { guion, marca, imagen_base64 } = req.body;
+  const { guion, marca, imagen_base64, estilo_cinematografico = 'Publicidad Emocional' } = req.body;
 
   if (!guion || guion.trim().length < 20) {
     return res.status(400).json({ success: false, error: 'guion es obligatorio (mín. 20 caracteres)' });
@@ -492,6 +492,8 @@ ${guion}
 **MARCA:**
 ${marcaCtx}
 
+**ESTILO CINEMATOGRÁFICO SELECCIONADO:** ${estilo_cinematografico}
+
 Genera un objeto JSON con exactamente ${skills.length} campo${skills.length > 1 ? 's' : ''}: ${clavesStr}. Sin markdown, sin texto adicional antes ni después del JSON:
 
 ${skillsPrompt}`,
@@ -504,6 +506,9 @@ ${skillsPrompt}`,
     }
     if (s.clave === 'guion_grafico') {
       return `- ${s.clave}: string (desglose completo de todas las escenas en un solo bloque de texto, separadas por saltos de línea)`;
+    }
+    if (s.clave === 'video_cinematografico') {
+      return `- ${s.clave}: objeto con exactamente 3 claves: "consultoria" (string), "keyframes" (array de objetos, cada uno con campos: escena/visual/shot_language/elementos_clave/audio_vo, todos strings), "inventario" (objeto con campos: personajes/productos/lugares/objetos, todos strings)`;
     }
     return `- ${s.clave}: string`;
   }).join('\n');

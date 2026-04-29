@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, Copy, Check, FileText, RefreshCw } from 'lucide-react';
+import StoryboardTable from './StoryboardTable';
 
 const NAR_STYLES = [
   { id: 'netflix',   label: 'Documental Netflix' },
@@ -36,6 +37,7 @@ export default function BriefPanel({ marca, mediaFile }) {
   const [guion, setGuion]     = useState(() => {
     return localStorage.getItem('piterlabs_guion_reciente') || '';
   });
+  const estiloCinematografico = localStorage.getItem('piterlabs_estilo_cinematografico') || 'Publicidad Emocional';
   const [loading, setLoading]   = useState(false);
   const [brief, setBrief]       = useState(null);
   const [error, setError]       = useState('');
@@ -80,7 +82,7 @@ export default function BriefPanel({ marca, mediaFile }) {
       const res = await fetch('/api/claude/generar-brief', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guion, marca: marca || {}, imagen_base64 }),
+        body: JSON.stringify({ guion, marca: marca || {}, imagen_base64, estilo_cinematografico: estiloCinematografico }),
       });
 
       const json = await res.json();
@@ -108,6 +110,15 @@ export default function BriefPanel({ marca, mediaFile }) {
       return typeof brief.narracion === 'object'
         ? (brief.narracion[activeNar] || '')
         : (brief.narracion || '');
+    }
+    // video_cinematografico returns an object — serialize for CopyButton
+    if (activeTab === 'video_cinematografico') {
+      const v = brief.video_cinematografico;
+      if (!v || typeof v !== 'object') return v || '';
+      const kfText = (v.keyframes || []).map(k =>
+        `[${k.escena}] Shot: ${k.shot_language} | VO: ${k.audio_vo}`
+      ).join('\n');
+      return `CONSULTORÍA:\n${v.consultoria}\n\nKEYFRAMES:\n${kfText}\n\nINVENTARIO:\nPersonajes: ${v.inventario?.personajes}\nProductos: ${v.inventario?.productos}\nLugares: ${v.inventario?.lugares}\nObjetos: ${v.inventario?.objetos}`;
     }
     return brief[activeTab] || '';
   };
@@ -235,10 +246,14 @@ export default function BriefPanel({ marca, mediaFile }) {
             )}
 
             {/* Content */}
-            <div className="p-[14px] max-h-[420px] overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-              <pre className="font-jetbrains text-[0.72rem] text-text-main leading-relaxed whitespace-pre-wrap">
-                {getTabContent() || <span className="text-muted italic">Sin contenido para este skill</span>}
-              </pre>
+            <div className={`p-[14px] overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent ${activeTab === 'video_cinematografico' ? '' : 'max-h-[420px]'}`}>
+              {activeTab === 'video_cinematografico' && typeof brief.video_cinematografico === 'object' ? (
+                <StoryboardTable data={brief.video_cinematografico} />
+              ) : (
+                <pre className="font-jetbrains text-[0.72rem] text-text-main leading-relaxed whitespace-pre-wrap">
+                  {getTabContent() || <span className="text-muted italic">Sin contenido para este skill</span>}
+                </pre>
+              )}
             </div>
 
           </div>

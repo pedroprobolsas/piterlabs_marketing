@@ -62,6 +62,11 @@ export default function CrearGuion() {
     }
   }, [guion, generando]);
 
+  // Persistir estilo cinematográfico elegido para uso en /camara
+  useEffect(() => {
+    localStorage.setItem('piterlabs_estilo_cinematografico', tipoCinematografia);
+  }, [tipoCinematografia]);
+
   const handleGenerarGuion = async () => {
     if (!tema.trim()) return;
     setGenerando(true);

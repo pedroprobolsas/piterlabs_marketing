@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Wand2, ChevronDown, ChevronUp, ToggleLeft, ToggleRight, Save, RefreshCw, CheckCircle } from 'lucide-react';
 
-const ORDEN_LABELS = ['01', '02', '03', '04', '05'];
+
 
 function SkillCard({ skill, onSave }) {
   const [expanded, setExpanded]   = useState(false);
@@ -68,7 +68,7 @@ function SkillCard({ skill, onSave }) {
 
         {/* Order badge */}
         <div className={`w-[34px] h-[34px] rounded-[9px] flex items-center justify-center font-bebas text-[1rem] tracking-[1px] shrink-0 transition-all ${badgeBg}`}>
-          {ORDEN_LABELS[(skill.orden - 1)] ?? '??'}
+          {String(skill.orden).padStart(2, '0')}
         </div>
 
         {/* Info */}

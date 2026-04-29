@@ -22,6 +22,7 @@ router.post('/generar-guion',      generarGuion);
 router.post('/adaptar-formatos',   adaptarFormatos);
 router.post('/generar-brief',      generarBrief);
 router.post('/chat-estratega',     chatEstratega);
+router.post('/analizar-producto',  analizarProducto);
 router.get('/fichas/:id',          getFicha);
 
 // Agents

@@ -12,19 +12,65 @@ export default function Ideacion() {
   });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [media, setMedia] = useState(null);
+  const [adnProtagonista, setAdnProtagonista] = useState(() => {
+    const saved = localStorage.getItem('estratega_adn');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [fichaId, setFichaId] = useState(() => {
     return localStorage.getItem('estratega_fichaId') || null;
   });
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem('estratega_messages', JSON.stringify(messages));
   }, [messages]);
 
   useEffect(() => {
+    if (adnProtagonista) localStorage.setItem('estratega_adn', JSON.stringify(adnProtagonista));
+    else localStorage.removeItem('estratega_adn');
+  }, [adnProtagonista]);
+
+  useEffect(() => {
     if (fichaId) localStorage.setItem('estratega_fichaId', fichaId);
     else localStorage.removeItem('estratega_fichaId');
   }, [fichaId]);
+
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleMediaUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setIsAnalyzing(true);
+    setMedia({ name: file.name, url: URL.createObjectURL(file) });
+
+    try {
+      const b64 = await fileToBase64(file);
+      const res = await fetch('/api/claude/analizar-producto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imagen_base64: b64 }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setAdnProtagonista(json.data);
+      }
+    } catch (err) {
+      console.error('Error analizando producto:', err);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -51,7 +97,8 @@ export default function Ideacion() {
         body: JSON.stringify({
           messages: updatedMessages,
           marca_config: marca || {},
-          ficha_id: fichaId
+          ficha_id: fichaId,
+          adn_protagonista: adnProtagonista
         }),
       });
 
@@ -124,23 +171,63 @@ export default function Ideacion() {
               <h2 className="font-bebas text-[1.8rem] tracking-[3px] text-text-main">ESTRATEGA</h2>
             </div>
             <p className="font-jetbrains text-[0.7rem] text-muted">
-              Consultor IA que te entrevista para construir una Ficha Estratégica sólida y no depender de la suerte.
+              Consultor IA que te entrevista para construir una Ficha Estratégica sólida.
               {marca?.nombre_marca && <span className="text-magenta ml-[6px]">Marca: {marca.nombre_marca}</span>}
             </p>
           </div>
-          {messages.length > 0 && (
-            <button
-              onClick={() => {
-                setMessages([]);
-                setFichaId(null);
-                localStorage.removeItem('estratega_messages');
-                localStorage.removeItem('estratega_fichaId');
-              }}
-              className="font-jetbrains text-[0.6rem] text-muted border border-border rounded-[6px] px-[9px] py-[5px] hover:text-red hover:border-red/50 transition-all cursor-pointer bg-white flex items-center gap-[5px]"
-            >
-              <RefreshCw size={11} /> Reiniciar Entrevista
-            </button>
-          )}
+          
+          <div className="flex items-center gap-[10px]">
+            {/* Briefing Flash / Product Context */}
+            <div className="flex items-center gap-[8px] bg-white border border-border rounded-[10px] p-[6px_12px] shadow-sm">
+              <span className="font-jetbrains text-[0.55rem] text-muted uppercase tracking-[1.5px]">Contexto del Protagonista:</span>
+              
+              {adnProtagonista ? (
+                <div className="flex items-center gap-[6px]">
+                  <div className="bg-magenta/10 text-magenta px-[8px] py-[3px] rounded-full font-jetbrains text-[0.6rem] font-bold border border-magenta/20">
+                    📦 {adnProtagonista.forma}
+                  </div>
+                  <div className="bg-violet/10 text-violet px-[8px] py-[3px] rounded-full font-jetbrains text-[0.6rem] font-bold border border-violet/20">
+                    ✨ {adnProtagonista.material}
+                  </div>
+                  <button 
+                    onClick={() => {setAdnProtagonista(null); setMedia(null);}}
+                    className="text-muted hover:text-magenta transition-colors ml-[4px]"
+                  >
+                    <RefreshCw size={10} />
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isAnalyzing}
+                  className="font-jetbrains text-[0.6rem] text-magenta hover:underline flex items-center gap-[4px] cursor-pointer"
+                >
+                  {isAnalyzing ? 'Analizando...' : '+ Cargar Producto (Opcional)'}
+                </button>
+              )}
+              <input 
+                ref={fileInputRef}
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleMediaUpload} 
+              />
+            </div>
+
+            {messages.length > 0 && (
+              <button
+                onClick={() => {
+                  setMessages([]);
+                  setFichaId(null);
+                  localStorage.removeItem('estratega_messages');
+                  localStorage.removeItem('estratega_fichaId');
+                }}
+                className="font-jetbrains text-[0.6rem] text-muted border border-border rounded-[6px] px-[9px] py-[5px] hover:text-red hover:border-red/50 transition-all cursor-pointer bg-white flex items-center gap-[5px]"
+              >
+                <RefreshCw size={11} /> Reiniciar
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -156,7 +243,12 @@ export default function Ideacion() {
               </div>
               <div className="font-jetbrains text-[0.8rem] text-text-main max-w-[400px]">
                 ¡Hola! Soy tu Estratega de Contenido.<br/><br/>
-                Cuéntame una idea vaga que tengas en mente o el tema del que quieres hablar, y te haré preguntas estratégicas hasta construir el ángulo perfecto.
+                {adnProtagonista ? (
+                  <span className="text-magenta">He analizado tu <b>{adnProtagonista.forma} ({adnProtagonista.material})</b>.</span>
+                ) : (
+                  <span>Cuéntame una idea vaga que tengas en mente.</span>
+                )}
+                <br/>Te haré preguntas estratégicas basadas en tu producto hasta construir el ángulo perfecto.
               </div>
             </div>
           ) : (

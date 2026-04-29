@@ -574,12 +574,43 @@ Dentro de los strings, nunca uses comillas dobles. Usa comillas simples si neces
 };
 
 // ---------------------------------------------------------------
+// POST /api/claude/analizar-producto
+// Analiza una imagen para extraer atributos técnicos (Forma, Material, Funcionalidad)
+// ---------------------------------------------------------------
+export const analizarProducto = async (req, res) => {
+  const { imagen_base64 } = req.body;
+  if (!imagen_base64) return res.status(400).json({ success: false, error: 'Imagen requerida' });
+
+  const client = getClaudeClient();
+  try {
+    const match = imagen_base64.match(/^data:([^;]+);base64,(.+)$/s);
+    const message = await client.messages.create({
+      model: CLAUDE_MODELS.RAPIDO,
+      max_tokens: 500,
+      system: [{ type: 'text', text: 'Eres un experto en packaging industrial. Analiza la imagen y devuelve un JSON con: forma, material, funcionalidad. Strings cortos.' }],
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: match[1], data: match[2] } },
+          { type: 'text', text: 'Devuelve solo el JSON.' }
+        ]
+      }]
+    });
+    const txt = message.content.find(b => b.type === 'text')?.text || '{}';
+    const cleanJson = txt.replace(/```json/g, '').replace(/```/g, '').trim();
+    res.json({ success: true, data: JSON.parse(cleanJson) });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// ---------------------------------------------------------------
 // POST /api/claude/chat-estratega
 // Chat interactivo con el Estratega de Contenido (SSE)
-// Body: { messages, marca_config }
+// Body: { messages, marca_config, adn_protagonista }
 // ---------------------------------------------------------------
 export const chatEstratega = async (req, res) => {
-  const { messages, marca_config, ficha_id } = req.body;
+  const { messages, marca_config, ficha_id, adn_protagonista } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ success: false, error: 'messages es obligatorio y debe ser un array' });
@@ -601,7 +632,7 @@ export const chatEstratega = async (req, res) => {
 
   const client = getClaudeClient();
 
-    let systemPrompt = '';
+  let systemPrompt = '';
   try {
     const skillRes = await pool.query("SELECT instrucciones FROM marketing.skills WHERE clave = 'estratega_interactivo' AND activa = TRUE");
     if (skillRes.rows.length > 0) {
@@ -613,14 +644,21 @@ export const chatEstratega = async (req, res) => {
 
   // Fallback por si la migración no se ha corrido
   if (!systemPrompt) {
-    systemPrompt = `Eres un estratega senior B2B. Conversa con el usuario para armar una Ficha Estratégica. Haz una sola pregunta a la vez. No generes la ficha hasta tener todo claro. Contexto: {marca_nombre} ({marca_industria}). Propuesta: {marca_propuesta}. Al terminar, genera la ficha y escribe [FICHA_COMPLETADA] al final.`;
+    systemPrompt = `Eres un estratega senior B2B. Conversa con el usuario para armar una Ficha Estratégica. Haz una sola pregunta a la vez. No generes la ficha hasta tener todo claro. Contexto de Objeto: {adn_protagonista}. Contexto de Marca: {marca_nombre} ({marca_industria}). Propuesta: {marca_propuesta}. Al terminar, genera la ficha y escribe [FICHA_COMPLETADA] al final.`;
   }
 
   // Interpolar variables
+  const adnStr = adn_protagonista 
+    ? (typeof adn_protagonista === 'object' 
+        ? `Forma: ${adn_protagonista.forma}, Material: ${adn_protagonista.material}, Funcionalidad: ${adn_protagonista.funcionalidad}`
+        : adn_protagonista)
+    : 'No definido aún. Pregunta al usuario qué producto quiere mostrar hoy.';
+
   systemPrompt = systemPrompt
     .replace('{marca_nombre}', marca_config?.nombre_marca || 'No definida')
     .replace('{marca_industria}', marca_config?.industria || 'No definida')
-    .replace('{marca_propuesta}', marca_config?.propuesta_valor || 'No definida');
+    .replace('{marca_propuesta}', marca_config?.propuesta_valor || 'No definida')
+    .replace('{adn_protagonista}', adnStr);
 
   try {
     const stream = client.messages.stream({

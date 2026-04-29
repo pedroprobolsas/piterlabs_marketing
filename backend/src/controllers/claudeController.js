@@ -744,16 +744,33 @@ export const getFicha = async (req, res) => {
 // AGENTES DE VIRALIZACIÓN
 // ===============================================================
 
+// Helper: obtiene la instrucción de un agente desde la BD con fallback hardcodeado
+const getAgenteSkill = async (clave, fallback) => {
+  try {
+    const res = await pool.query(
+      'SELECT instrucciones FROM marketing.skills WHERE clave = $1 AND activa = TRUE',
+      [clave]
+    );
+    return res.rows.length > 0 ? res.rows[0].instrucciones : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 export const agenteHumor = async (req, res) => {
   const { guion, marca_config } = req.body;
   if (!guion) return res.status(400).json({ success: false, error: 'Guion es obligatorio' });
+
+  const FALLBACK = 'Eres un guionista de comedia especializado en contenido B2B y marketing corporativo latinoamericano. Inyectas humor sutil, ironía y analogías graciosas sin perder el profesionalismo. Mantén la estructura y el mensaje central del guion original.';
+  const systemPrompt = await getAgenteSkill('agente_humor', FALLBACK);
+
   const client = getClaudeClient();
   try {
     const message = await client.messages.create({
       model: CLAUDE_MODELS.RAPIDO,
       max_tokens: 8000,
-      system: [{ type: 'text', text: 'Eres un guionista de comedia especializado en contenido B2B y marketing corporativo latinoamericano. Inyectas humor sutil, ironía y analogías graciosas sin perder el profesionalismo.', cache_control: { type: 'ephemeral' } }],
-      messages: [{ role: 'user', content: `Reescribe este guion inyectando humor, ironía o analogías curiosas. Mantén la estructura y el mensaje central.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
+      system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+      messages: [{ role: 'user', content: `Reescribe este guion con humor, ironía y analogías. Mantén la estructura y el mensaje central.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
     });
     const txt = message.content.find(b => b.type === 'text')?.text || '';
     res.json({ success: true, data: txt });
@@ -765,13 +782,17 @@ export const agenteHumor = async (req, res) => {
 export const agenteSeo = async (req, res) => {
   const { guion, marca_config } = req.body;
   if (!guion) return res.status(400).json({ success: false, error: 'Guion es obligatorio' });
+
+  const FALLBACK = 'Eres un experto en SEO para redes sociales (TikTok, Instagram, LinkedIn). Genera hashtags, hora de publicación y caption gancho para el contenido.';
+  const systemPrompt = await getAgenteSkill('agente_seo', FALLBACK);
+
   const client = getClaudeClient();
   try {
     const message = await client.messages.create({
       model: CLAUDE_MODELS.RAPIDO,
       max_tokens: 2000,
-      system: [{ type: 'text', text: 'Eres un experto en SEO para redes sociales (TikTok, Instagram, LinkedIn).', cache_control: { type: 'ephemeral' } }],
-      messages: [{ role: 'user', content: `Analiza este guion y genera: 1) 5 Hashtags principales, 2) 3 Hashtags nicho, 3) Mejor hora de publicación sugerida para B2B Latam, 4) Título gancho para el caption.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
+      system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+      messages: [{ role: 'user', content: `Analiza este guion y genera la estrategia SEO para redes sociales.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
     });
     const txt = message.content.find(b => b.type === 'text')?.text || '';
     res.json({ success: true, data: txt });
@@ -783,13 +804,17 @@ export const agenteSeo = async (req, res) => {
 export const agenteReproposito = async (req, res) => {
   const { guion, marca_config } = req.body;
   if (!guion) return res.status(400).json({ success: false, error: 'Guion es obligatorio' });
+
+  const FALLBACK = 'Eres un experto en content repurposing. Tu misión es tomar un guion largo y fragmentarlo en 5 piezas de microcontenido altamente virales para múltiples plataformas.';
+  const systemPrompt = await getAgenteSkill('agente_reproposito', FALLBACK);
+
   const client = getClaudeClient();
   try {
     const message = await client.messages.create({
       model: CLAUDE_MODELS.PRINCIPAL,
       max_tokens: 8000,
-      system: [{ type: 'text', text: 'Eres un experto en content repurposing. Tu misión es tomar un guion largo y fragmentarlo en 5 piezas de microcontenido altamente virales.', cache_control: { type: 'ephemeral' } }],
-      messages: [{ role: 'user', content: `Toma este guion y divídelo en 5 piezas cortas (ej: 3 Tweets/Threads cortos, 1 frase citada para LinkedIn, 1 Short directo). Cada pieza debe sostenerse por sí sola.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
+      system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+      messages: [{ role: 'user', content: `Fragmenta este guion en 5 piezas de microcontenido virales para múltiples plataformas.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
     });
     const txt = message.content.find(b => b.type === 'text')?.text || '';
     res.json({ success: true, data: txt });

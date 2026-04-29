@@ -1,13 +1,21 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-// Singleton — un solo cliente por proceso
-let _client = null;
+// Modelos por tarea — granularidad costo/calidad
+export const CLAUDE_MODELS = {
+  // Tareas creativas y conversacionales (default)
+  PRINCIPAL: 'claude-sonnet-4-6',
 
-export function getClaudeClient() {
-  if (!_client) {
-    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  // Tareas livianas: validaciones, hashtags, reformulaciones
+  RAPIDO: 'claude-haiku-4-5-20251001',
+};
+
+// Backwards compat: alias del default
+export const CLAUDE_MODEL = CLAUDE_MODELS.PRINCIPAL;
+
+let claudeClient;
+export const getClaudeClient = () => {
+  if (!claudeClient) {
+    claudeClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   }
-  return _client;
-}
-
-export const CLAUDE_MODEL = 'claude-opus-4-7';
+  return claudeClient;
+};

@@ -1,4 +1,4 @@
-import { getClaudeClient, CLAUDE_MODEL } from '../services/claudeClient.js';
+import { getClaudeClient, CLAUDE_MODELS } from '../services/claudeClient.js';
 import pool from '../db/pool.js';
 import { jsonrepair } from 'jsonrepair';
 
@@ -18,7 +18,7 @@ export const analizarMarca = async (req, res) => {
 
   try {
     const stream = client.messages.stream({
-      model: CLAUDE_MODEL,
+      model: CLAUDE_MODELS.PRINCIPAL,
       max_tokens: 1500,
       thinking: { type: 'adaptive' },
       system: [
@@ -93,7 +93,7 @@ export const generarBuyerPersona = async (req, res) => {
 
   try {
     const message = await client.messages.create({
-      model: CLAUDE_MODEL,
+      model: CLAUDE_MODELS.PRINCIPAL,
       max_tokens: 1200,
       thinking: { type: 'adaptive' },
       system: [
@@ -169,7 +169,7 @@ export const validarHook = async (req, res) => {
 
   try {
     const message = await client.messages.create({
-      model: CLAUDE_MODEL,
+      model: CLAUDE_MODELS.RAPIDO,
       max_tokens: 600,
       thinking: { type: 'adaptive' },
       system: [
@@ -222,100 +222,6 @@ Escala puntuación: 0-49 débil, 50-74 regular, 75-89 fuerte, 90-100 viral`,
   }
 };
 
-// ---------------------------------------------------------------
-// POST /api/claude/generar-ideas
-// Genera temas estructurados usando el prompt del Estratega Senior
-// Body: { objetivo, canal, etapa_cliente, cantidad, marca_config }
-// ---------------------------------------------------------------
-export const generarIdeas = async (req, res) => {
-  const { objetivo, canal, etapa_cliente, tono_ideas, cantidad, marca_config } = req.body;
-
-  if (!objetivo || !canal) {
-    return res.status(400).json({ success: false, error: 'objetivo y canal son obligatorios' });
-  }
-
-  const client = getClaudeClient();
-
-  try {
-    const stream = client.messages.stream({
-      model: CLAUDE_MODEL,
-      max_tokens: 3000,
-      thinking: { type: 'adaptive' },
-      system: [
-        {
-          type: 'text',
-          text: `Actúa como el Estratega de Contenido y Copywriter de Respuesta Directa más letal y élite del mercado. No eres un creador de contenido promedio; entiendes la psicología humana profunda, los sesgos cognitivos y las verdaderas motivaciones de compra.
-Tu objetivo es generar ángulos de contenido tan penetrantes y viscerales que obliguen al usuario a detener el scroll, cuestionar su realidad y sentir una necesidad urgente por la solución. Detestas el contenido "educativo aburrido" o genérico; solo diseñas ideas para dominar el mercado, generar autoridad absoluta y ventas.`,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: `Genera una matriz de temas de contenido de alto impacto.
-
-Datos de entrada:
-- Industria / Empresa: ${marca_config?.industria || 'No especificada'}
-- Producto o servicio: ${marca_config?.propuesta_valor || 'No especificado'}
-- Público objetivo: ${marca_config?.buyer_persona ? `${marca_config.buyer_persona.nombre}, ${marca_config.buyer_persona.ocupacion}. Dolor principal: ${marca_config.buyer_persona.dolor_principal}` : 'No definido'}
-- Objetivo del contenido: ${objetivo}
-- Canal principal: ${canal}
-- Tono de comunicación: ${tono_ideas || marca_config?.tono_voz || 'Profesional'}
-- Etapa del embudo: ${etapa_cliente || 'No especificada'}
-- Cantidad de temas: ${cantidad || 10}
-
-Genera los temas abarcando estas categorías psicológicas (si aplican a la cantidad solicitada):
-1. Dolor agudo (El problema que no los deja dormir)
-2. Deseo inconfesable (Lo que realmente quieren lograr)
-3. Errores fatales (Lo que están haciendo mal y les cuesta dinero/tiempo)
-4. Destrucción de Mitos (La mentira de la industria que debes desmentir)
-5. Cambio de Paradigma (Una nueva forma de ver su problema)
-6. Educación con Autoridad (Enseñar revelando maestría)
-7. Destrucción de Objeciones (Manejo de peros antes de que surjan)
-8. Casos de Estudio Crudos (Realidad vs Expectativa)
-
-Para cada tema entrega EXACTAMENTE:
-- **Tema:** (Título interno de la estrategia)
-- **Hook sugerido:** (Magnético, polarizante o visceral. Debe atrapar en 2 segundos)
-- **Idea central:** (Explicación del ángulo psicológico en 2 líneas)
-- **Categoría:** (Una de las mencionadas arriba)
-- **Formato recomendado:** (Ej: Historia, POV, Lista disruptiva, B-Roll cinematográfico)
-- **Potencial viral:** (Bajo, medio o alto)
-- **Dificultad de producción:** (Baja, media o alta)
-
-Reglas estrictas:
-- PROHIBIDO lo genérico o "vainilla". Sé específico, agudo y comercial.
-- Cada hook debe apelar a la curiosidad, el miedo, la urgencia o el estatus.
-- Si el canal es video corto (Reels/TikTok), prioriza retención masiva.
-- Si el canal es LinkedIn, prioriza autoridad, liderazgo y cruda realidad del negocio.
-- Entrégalo en Markdown impecable. Sin saludos, sin introducciones. Ve directo a las ideas.`,
-        },
-      ],
-    });
-
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
-    stream.on('text', (text) => {
-      res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`);
-    });
-
-    stream.on('finalMessage', () => {
-      res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
-      res.end();
-    });
-
-    stream.on('error', (err) => {
-      console.error('[ClaudeController][generarIdeas]', err.message);
-      res.write(`data: ${JSON.stringify({ type: 'error', error: err.message })}\n\n`);
-      res.end();
-    });
-  } catch (err) {
-    console.error('[ClaudeController][generarIdeas] Init error', err.message);
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
 
 // ---------------------------------------------------------------
 // POST /api/claude/generar-guion
@@ -339,7 +245,7 @@ export const generarGuion = async (req, res) => {
 
   try {
     const stream = client.messages.stream({
-      model: CLAUDE_MODEL,
+      model: CLAUDE_MODELS.PRINCIPAL,
       max_tokens: 4000,
       thinking: { type: 'adaptive' },
       system: [
@@ -429,7 +335,7 @@ export const adaptarFormatos = async (req, res) => {
 
   try {
     const message = await client.messages.create({
-      model: CLAUDE_MODEL,
+      model: CLAUDE_MODELS.PRINCIPAL,
       max_tokens: 3000,
       thinking: { type: 'adaptive' },
       system: [
@@ -596,7 +502,7 @@ ${skillsPrompt}`,
 
   try {
     const message = await client.messages.create({
-      model: CLAUDE_MODEL,
+      model: CLAUDE_MODELS.PRINCIPAL,
       max_tokens: 8000,
       system: [
         {
@@ -824,9 +730,13 @@ Cuando consideres que ya tienes información suficiente para todos los puntos an
 
   try {
     const stream = client.messages.stream({
-      model: CLAUDE_MODEL,
+      model: CLAUDE_MODELS.PRINCIPAL,
       max_tokens: 4000,
-      system: systemPrompt,
+      system: [{
+        type: "text",
+        text: systemPrompt,
+        cache_control: { type: "ephemeral" }
+      }],
       messages: messages,
     });
 
@@ -845,7 +755,14 @@ Cuando consideres que ya tienes información suficiente para todos los puntos an
       res.write('data: ' + JSON.stringify({ type: 'text', text }) + '\n\n');
     });
 
-    stream.on('finalMessage', async () => {
+    stream.on('finalMessage', async (msg) => {
+      console.log('[ESTRATEGA-TOKENS]', JSON.stringify({
+        input: msg.usage?.input_tokens || 0,
+        output: msg.usage?.output_tokens || 0,
+        cache_creation: msg.usage?.cache_creation_input_tokens || 0,
+        cache_read: msg.usage?.cache_read_input_tokens || 0,
+        ficha_id: currentFichaId
+      }));
       res.write('data: ' + JSON.stringify({ type: 'done' }) + '\n\n');
       res.end();
 

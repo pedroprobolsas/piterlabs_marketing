@@ -508,7 +508,7 @@ ${skillsPrompt}`,
       return `- ${s.clave}: string (desglose completo de todas las escenas en un solo bloque de texto, separadas por saltos de línea)`;
     }
     if (s.clave === 'video_cinematografico') {
-      return `- ${s.clave}: objeto con exactamente 3 claves: "consultoria" (string), "keyframes" (array de objetos, cada uno con campos: escena/visual/shot_language/elementos_clave/audio_vo, todos strings), "inventario" (objeto con campos: personajes/productos/lugares/objetos, todos strings)`;
+      return `- ${s.clave}: objeto con exactamente 4 claves: "atributos_detectados" (objeto con forma/material/funcionalidad), "consultoria" (string), "keyframes" (array de objetos, cada uno con campos: escena/visual/shot_language/elementos_clave/audio_vo), "inventario" (objeto con campos: personajes/productos/lugares/objetos)`;
     }
     return `- ${s.clave}: string`;
   }).join('\n');

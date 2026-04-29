@@ -113,7 +113,7 @@ function InventarioCard({ icon: Icon, label, value, color }) {
 export default function StoryboardTable({ data }) {
   if (!data || typeof data !== 'object') return null;
 
-  const { consultoria = '', keyframes = [], inventario = {} } = data;
+  const { atributos_detectados = {}, consultoria = '', keyframes = [], inventario = {} } = data;
 
   const inventarioItems = [
     { icon: User,    label: 'Personajes',    value: inventario.personajes, color: 'bg-violet' },
@@ -125,14 +125,34 @@ export default function StoryboardTable({ data }) {
   return (
     <div className="space-y-[18px]">
 
-      {/* HEADER: Copiar todo */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-[8px]">
-          <span className="font-jetbrains text-[0.62rem] text-muted uppercase tracking-[1.5px]">
-            {keyframes.length} keyframes generados
+      {/* HEADER: Atributos Detectados y Botón Copiar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-[12px]">
+        <div className="flex flex-wrap items-center gap-[8px]">
+          <span className="font-jetbrains text-[0.55rem] text-muted uppercase tracking-[1.5px] mr-[4px]">
+            Detección Vision:
           </span>
+          {atributos_detectados.forma && (
+            <div className="bg-magenta/10 border border-magenta/20 text-magenta px-[8px] py-[3px] rounded-full font-jetbrains text-[0.6rem] font-bold">
+              📦 {atributos_detectados.forma}
+            </div>
+          )}
+          {atributos_detectados.material && (
+            <div className="bg-violet/10 border border-violet/20 text-violet px-[8px] py-[3px] rounded-full font-jetbrains text-[0.6rem] font-bold">
+              ✨ {atributos_detectados.material}
+            </div>
+          )}
+          {atributos_detectados.funcionalidad && (
+            <div className="bg-green/10 border border-green/20 text-green-700 px-[8px] py-[3px] rounded-full font-jetbrains text-[0.6rem] font-bold">
+              ⚡ {atributos_detectados.funcionalidad}
+            </div>
+          )}
         </div>
-        <CopyBtn text={storyboardToText(data)} label="Copiar todo" />
+        <div className="flex items-center gap-[10px] justify-between md:justify-end">
+          <span className="font-jetbrains text-[0.6rem] text-muted hidden lg:inline">
+            {keyframes.length} keyframes
+          </span>
+          <CopyBtn text={storyboardToText(data)} label="Copiar todo el Storyboard" />
+        </div>
       </div>
 
       {/* SECCIÓN 1: Consultoría de Segmentación */}

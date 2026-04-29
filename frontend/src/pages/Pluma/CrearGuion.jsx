@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { PenTool, Sparkles, Copy, Check, RefreshCw } from 'lucide-react';
 import { useMarca } from '../../hooks/useMarca';
 import PlantillaSelector from '../../components/pluma/PlantillaSelector';
@@ -17,6 +18,9 @@ export default function CrearGuion() {
   const [activeSection, setActiveSection] = useState('guion'); // 'guion' | 'formatos'
   const guionRef = useRef(null);
 
+  const [searchParams] = useSearchParams();
+  const fichaId = searchParams.get('ficha_id');
+
   // Cargar idea reciente de la Máquina de Ideas si existe
   useEffect(() => {
     const recentIdea = localStorage.getItem('piterlabs_ideas_recientes');
@@ -26,6 +30,24 @@ export default function CrearGuion() {
       localStorage.removeItem('piterlabs_ideas_recientes');
     }
   }, []);
+
+  // Cargar ficha estratégica desde DB
+  useEffect(() => {
+    if (fichaId) {
+      fetch(`/api/claude/fichas/${fichaId}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success && d.data) {
+            const conv = d.data.conversacion;
+            const lastMsg = conv[conv.length - 1];
+            if (lastMsg) {
+              setTema(lastMsg.content.replace('[FICHA_COMPLETADA]', ''));
+            }
+          }
+        })
+        .catch(err => console.error('Error cargando ficha:', err));
+    }
+  }, [fichaId]);
 
   // Guardar en localStorage cuando se termina de generar
   useEffect(() => {
@@ -117,7 +139,7 @@ export default function CrearGuion() {
               <textarea
                 value={tema}
                 onChange={e => setTema(e.target.value)}
-                placeholder="Ej: Cómo elegir el empaque correcto para tu producto. (Puedes pegar aquí el resultado completo de la Máquina de Ideas)"
+                placeholder="Ej: Cómo elegir el empaque correcto para tu producto. (Puedes pegar aquí el resultado completo del Estratega)"
                 className="input-base w-full min-h-[120px] resize-y font-jetbrains text-[0.8rem]"
               />
               <div className="flex justify-end">

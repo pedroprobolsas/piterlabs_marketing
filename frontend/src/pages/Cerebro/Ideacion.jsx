@@ -1,176 +1,201 @@
-import { useState, useRef } from 'react';
-import { Lightbulb, Sparkles, RefreshCw, PenTool } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Target, Send, Bot, User, RefreshCw, PenTool } from 'lucide-react';
 import { useMarca } from '../../hooks/useMarca';
+import { useNavigate } from 'react-router-dom';
 
 export default function Ideacion() {
   const { marca } = useMarca();
+  const navigate = useNavigate();
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [fichaId, setFichaId] = useState(null);
+  const messagesEndRef = useRef(null);
 
-  const [objetivo, setObjetivo] = useState('Generar leads y autoridad');
-  const [canal, setCanal] = useState('Instagram Reels / TikTok');
-  const [etapaCliente, setEtapaCliente] = useState('Descubrimiento (TOFU)');
-  const [tono, setTono] = useState('Directo');
-  const [cantidad, setCantidad] = useState(10);
-  
-  const [ideas, setIdeas] = useState('');
-  const [generando, setGenerando] = useState(false);
-  const ideasRef = useRef(null);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-  const handleGenerarIdeas = async () => {
-    setGenerando(true);
-    setIdeas('');
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = { role: 'user', content: input };
+    const updatedMessages = [...messages, userMessage];
+    
+    setMessages(updatedMessages);
+    setInput('');
+    setIsLoading(true);
 
     try {
-      const res = await fetch('/api/claude/generar-ideas', {
+      const res = await fetch('/api/claude/chat-estratega', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          objetivo,
-          canal,
-          etapa_cliente: etapaCliente,
-          tono_ideas: tono,
-          cantidad,
+          messages: updatedMessages,
           marca_config: marca || {},
+          ficha_id: fichaId
         }),
       });
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+      
+      let assistantMessage = { role: 'assistant', content: '' };
+      setMessages(prev => [...prev, assistantMessage]);
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value);
         const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
+        
         for (const line of lines) {
           try {
             const evt = JSON.parse(line.slice(6));
-            if (evt.type === 'text') {
-              setIdeas(prev => prev + evt.text);
-              setTimeout(() => ideasRef.current?.scrollTo({ top: ideasRef.current.scrollHeight, behavior: 'smooth' }), 20);
+            if (evt.type === 'meta' && evt.ficha_id) {
+              setFichaId(evt.ficha_id);
+            } else if (evt.type === 'text') {
+              assistantMessage.content += evt.text;
+              setMessages(prev => {
+                const newArr = [...prev];
+                newArr[newArr.length - 1] = { ...assistantMessage };
+                return newArr;
+              });
             }
           } catch { /* ignore */ }
         }
       }
     } catch (e) {
-      setIdeas(`Error: ${e.message}`);
+      setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${e.message}` }]);
     } finally {
-      setGenerando(false);
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  // Check if ficha is completed
+  const lastMessage = messages[messages.length - 1];
+  const isCompletada = lastMessage?.role === 'assistant' && lastMessage.content.includes('[FICHA_COMPLETADA]');
+
+  const handleGenerarGuion = () => {
+    if (fichaId) {
+      navigate(`/pluma?ficha_id=${fichaId}`);
     }
   };
 
   return (
-    <div className="w-full max-w-[1200px]">
+    <div className="w-full max-w-[1000px] mx-auto h-[calc(100vh-100px)] flex flex-col">
       {/* Header */}
-      <div className="mb-[24px]">
-        <div className="flex items-center gap-[10px] mb-[4px]">
-          <Lightbulb size={20} className="text-magenta" />
-          <h2 className="font-bebas text-[1.8rem] tracking-[3px] text-text-main">MÁQUINA DE IDEAS</h2>
+      <div className="mb-[20px] shrink-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-[10px] mb-[4px]">
+              <Target size={20} className="text-magenta" />
+              <h2 className="font-bebas text-[1.8rem] tracking-[3px] text-text-main">ESTRATEGA</h2>
+            </div>
+            <p className="font-jetbrains text-[0.7rem] text-muted">
+              Consultor IA que te entrevista para construir una Ficha Estratégica sólida y no depender de la suerte.
+              {marca?.nombre_marca && <span className="text-magenta ml-[6px]">Marca: {marca.nombre_marca}</span>}
+            </p>
+          </div>
+          {messages.length > 0 && (
+            <button
+              onClick={() => {
+                setMessages([]);
+                setFichaId(null);
+              }}
+              className="font-jetbrains text-[0.6rem] text-muted border border-border rounded-[6px] px-[9px] py-[5px] hover:text-red hover:border-red/50 transition-all cursor-pointer bg-white flex items-center gap-[5px]"
+            >
+              <RefreshCw size={11} /> Reiniciar Entrevista
+            </button>
+          )}
         </div>
-        <p className="font-jetbrains text-[0.7rem] text-muted">
-          Genera temas de contenido estratégicos basados en el dolor y deseo de tu audiencia.
-          {marca?.nombre_marca && <span className="text-magenta ml-[6px]">Marca: {marca.nombre_marca}</span>}
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-[20px]">
-        {/* LEFT: Controles */}
-        <div className="space-y-[16px]">
-          <div className="bg-white border border-border rounded-[14px] p-[20px_22px]">
-            <h3 className="font-jetbrains text-[0.75rem] text-text-main uppercase tracking-[1.5px] font-bold mb-[16px] flex items-center gap-[8px]">
-              <Sparkles size={14} className="text-magenta" /> Parámetros Estratégicos
-            </h3>
-            
-            <div className="space-y-[14px]">
-              <div>
-                <label className="font-jetbrains text-[0.65rem] text-text2 uppercase tracking-[1px] font-bold block mb-[6px]">Objetivo del Contenido</label>
-                <input value={objetivo} onChange={e => setObjetivo(e.target.value)} className="input-base w-full" placeholder="Ej: Generar leads" />
+      {/* Chat Area */}
+      <div className="flex-1 bg-[#f7f7fa] border border-border rounded-[14px] flex flex-col min-h-0 overflow-hidden shadow-sm">
+        
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-[20px] space-y-[20px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center gap-[16px] opacity-60">
+              <div className="w-[60px] h-[60px] rounded-full bg-magenta/10 flex items-center justify-center">
+                <Bot size={30} className="text-magenta" />
               </div>
-              
-              <div>
-                <label className="font-jetbrains text-[0.65rem] text-text2 uppercase tracking-[1px] font-bold block mb-[6px]">Canal Principal</label>
-                <select value={canal} onChange={e => setCanal(e.target.value)} className="input-base w-full">
-                  <option value="Instagram Reels / TikTok">Instagram Reels / TikTok (Retención)</option>
-                  <option value="LinkedIn">LinkedIn (Autoridad)</option>
-                  <option value="YouTube">YouTube (Profundidad)</option>
-                  <option value="Email Marketing">Email Marketing (Conversión)</option>
-                </select>
+              <div className="font-jetbrains text-[0.8rem] text-text-main max-w-[400px]">
+                ¡Hola! Soy tu Estratega de Contenido.<br/><br/>
+                Cuéntame una idea vaga que tengas en mente o el tema del que quieres hablar, y te haré preguntas estratégicas hasta construir el ángulo perfecto.
               </div>
-
-              <div>
-                <label className="font-jetbrains text-[0.65rem] text-text2 uppercase tracking-[1px] font-bold block mb-[6px]">Etapa del Cliente</label>
-                <select value={etapaCliente} onChange={e => setEtapaCliente(e.target.value)} className="input-base w-full">
-                  <option value="TOFU (Descubrimiento)">TOFU (Descubrimiento y Atracción)</option>
-                  <option value="MOFU (Consideración)">MOFU (Consideración y Confianza)</option>
-                  <option value="BOFU (Decisión)">BOFU (Decisión y Conversión)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="font-jetbrains text-[0.65rem] text-text2 uppercase tracking-[1px] font-bold block mb-[6px]">Tono Narrativo</label>
-                <select value={tono} onChange={e => setTono(e.target.value)} className="input-base w-full">
-                  <option value="Directo">Directo</option>
-                  <option value="Profesional">Profesional</option>
-                  <option value="Premium">Premium</option>
-                  <option value="Educativo">Educativo</option>
-                  <option value="Técnico">Técnico</option>
-                  <option value="Cercano">Cercano</option>
-                  <option value="Emocional">Emocional</option>
-                  <option value="Gracioso">Gracioso</option>
-                  <option value="Irónico">Irónico</option>
-                  <option value="Provocador">Provocador</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="font-jetbrains text-[0.65rem] text-text2 uppercase tracking-[1px] font-bold block mb-[6px]">Cantidad de Temas</label>
-                <input type="number" min="5" max="20" value={cantidad} onChange={e => setCantidad(e.target.value)} className="input-base w-full" />
-              </div>
-
-              <button
-                onClick={handleGenerarIdeas}
-                disabled={generando}
-                className="w-full mt-[10px] flex justify-center items-center gap-[7px] bg-magenta text-white font-bebas text-[1.1rem] tracking-[1.5px] px-[20px] py-[12px] rounded-[9px] cursor-pointer hover:bg-magenta-bright transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_14px_rgba(204,0,204,0.2)]"
-              >
-                {generando
-                  ? <><RefreshCw size={16} className="animate-spin" /> PROCESANDO MATRIZ...</>
-                  : <><Lightbulb size={16} /> GENERAR MÁQUINA DE IDEAS</>}
-              </button>
             </div>
-          </div>
+          ) : (
+            messages.map((msg, idx) => {
+              const content = msg.content.replace('[FICHA_COMPLETADA]', '');
+              
+              return (
+                <div key={idx} className={`flex gap-[12px] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                  <div className={`w-[32px] h-[32px] rounded-full flex items-center justify-center shrink-0 ${
+                    msg.role === 'user' ? 'bg-white border border-border' : 'bg-magenta text-white shadow-md'
+                  }`}>
+                    {msg.role === 'user' ? <User size={16} className="text-text-main" /> : <Bot size={16} />}
+                  </div>
+                  <div className={`max-w-[80%] rounded-[12px] px-[16px] py-[12px] ${
+                    msg.role === 'user' 
+                      ? 'bg-white border border-border text-text-main shadow-sm' 
+                      : 'bg-[var(--magenta-soft,#ffe6ff)] border border-magenta text-text-main shadow-sm'
+                  }`}>
+                    <div className="prose prose-sm max-w-none font-jetbrains text-[0.78rem] leading-relaxed whitespace-pre-wrap">
+                      {content}
+                      {isLoading && idx === messages.length - 1 && msg.role === 'assistant' && !isCompletada && (
+                        <span className="inline-block w-[6px] h-[12px] bg-magenta ml-[4px] animate-pulse align-middle" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* RIGHT: Output */}
-        <div className="bg-white border border-border rounded-[14px] flex flex-col h-[600px]">
-          <div className="flex items-center justify-between px-[22px] py-[14px] border-b border-border-soft rounded-t-[14px]">
-            <div className="flex items-center gap-[8px]">
-              <Lightbulb size={15} className="text-magenta" />
-              <span className="font-bebas text-[1.1rem] tracking-[2px] text-text-main">IDEAS GENERADAS</span>
-            </div>
-            {ideas && !generando && (
-              <button onClick={() => {
-                localStorage.setItem('piterlabs_ideas_recientes', ideas);
-              }} className="font-jetbrains text-[0.6rem] text-muted border border-border rounded-[6px] px-[9px] py-[5px] hover:text-magenta transition-all cursor-pointer bg-white flex items-center gap-[5px]">
-                <PenTool size={11} /> Llevar al Guion
+        {/* Input Area */}
+        <div className="p-[16px] border-t border-border-soft bg-white">
+          {isCompletada ? (
+            <button
+              onClick={handleGenerarGuion}
+              className="w-full flex justify-center items-center gap-[7px] bg-magenta text-white font-bebas text-[1.2rem] tracking-[1.5px] px-[20px] py-[14px] rounded-[9px] cursor-pointer hover:bg-magenta-bright transition-all shadow-[0_4px_14px_rgba(204,0,204,0.2)]"
+            >
+              <PenTool size={18} /> GENERAR GUION CON ESTA FICHA
+            </button>
+          ) : (
+            <div className="relative">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Escribe tu idea aquí (Shift + Enter para nueva línea)..."
+                className="w-full input-base pr-[50px] resize-none overflow-hidden bg-[#f7f7fa]"
+                rows={Math.min(5, input.split('\n').length || 1)}
+                style={{ minHeight: '44px' }}
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || isLoading}
+                className="absolute right-[6px] bottom-[6px] w-[32px] h-[32px] flex items-center justify-center rounded-[8px] bg-magenta text-white cursor-pointer hover:bg-magenta-bright transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send size={14} className="mr-[2px]" />
               </button>
-            )}
-          </div>
-          
-          <div ref={ideasRef} className="flex-1 overflow-y-auto p-[22px] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-            {ideas ? (
-              <div className="prose prose-sm max-w-none font-jetbrains text-[0.8rem] text-text-main leading-relaxed">
-                {/* Renderizamos markdown básico preservando saltos de línea */}
-                <pre className="font-jetbrains text-[0.78rem] whitespace-pre-wrap">{ideas}</pre>
-                {generando && <span className="inline-block w-[8px] h-[4px] bg-magenta ml-[3px] animate-blink rounded-sm" />}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-center gap-[12px] opacity-50">
-                <Lightbulb size={40} className="text-border" />
-                <div className="font-jetbrains text-[0.75rem] text-muted max-w-[250px]">
-                  Configura tus parámetros y presiona Generar para obtener una matriz estratégica de temas.
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

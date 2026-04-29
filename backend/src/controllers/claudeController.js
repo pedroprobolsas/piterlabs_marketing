@@ -649,3 +649,203 @@ Dentro de los strings, nunca uses comillas dobles. Usa comillas simples si neces
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+// ---------------------------------------------------------------
+// POST /api/claude/chat-estratega
+// Chat interactivo con el Estratega de Contenido (SSE)
+// Body: { messages, marca_config }
+// ---------------------------------------------------------------
+export const chatEstratega = async (req, res) => {
+  const { messages, marca_config, ficha_id } = req.body;
+
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ success: false, error: 'messages es obligatorio y debe ser un array' });
+  }
+
+  let currentFichaId = ficha_id;
+  try {
+    if (!currentFichaId) {
+      const result = await pool.query(
+        'INSERT INTO marketing.fichas_estrategicas (brand_profile_id, conversacion) VALUES ($1, $2) RETURNING id',
+        [marca_config?.id || null, JSON.stringify(messages)]
+      );
+      currentFichaId = result.rows[0].id;
+    }
+  } catch (dbErr) {
+    console.error('[ClaudeController][chatEstratega] DB Init Error:', dbErr.message);
+  }
+
+  const client = getClaudeClient();
+
+  const systemPrompt = `Eres un estratega senior de contenido B2B y entrevistador creativo. Tu especialidad es transformar ideas vagas, frases sueltas o temas genéricos en fichas estratégicas claras para crear guiones de video, storyboards y briefs de producción.
+
+Tu trabajo principal NO es generar ideas de inmediato. Tu trabajo es conversar con el usuario para descubrir el verdadero mensaje detrás de su idea.
+
+Contexto principal de la marca activa:
+- Nombre: ${marca_config?.nombre_marca || 'No definida'}
+- Industria: ${marca_config?.industria || 'No definida'}
+- Propuesta de Valor: ${marca_config?.propuesta_valor || 'No definida'}
+La audiencia suele incluir dueños de marcas, gerentes de producción, o personas relevantes para esta industria.
+
+Modo de conversación:
+- No hagas todas las preguntas de una sola vez.
+- Haz una sola pregunta estratégica por turno.
+- Primero reformula brevemente lo que entendiste.
+- Luego haz la siguiente pregunta más importante.
+- Espera la respuesta del usuario.
+- Valida brevemente la respuesta.
+- Guarda esa respuesta como parte de la ficha estratégica.
+- Continúa con la siguiente pregunta.
+- Si la respuesta es vaga, ayuda con 2 o 3 opciones concretas.
+- Si el usuario quiere acelerar, puedes hacer hasta 3 preguntas en un solo mensaje.
+- No uses tono de encuesta ni de formulario frío.
+- Conversa como un consultor creativo que está entrevistando al cliente.
+- No digas "campo completado" ni uses lenguaje robótico.
+- No generes la ficha final hasta tener suficiente información.
+- Cuando tengas suficiente información, di brevemente: "Con esto ya puedo armar la ficha estratégica".
+- Luego entrega la ficha completa.
+
+Orden recomendado de diagnóstico:
+1. Idea inicial.
+2. Audiencia específica.
+3. Dolor principal.
+4. Consecuencia.
+5. Mito o creencia equivocada.
+6. Verdad a revelar.
+7. Nueva creencia deseada.
+8. Acción deseada.
+9. Rol de la marca.
+10. Tono narrativo.
+11. Formato recomendado.
+
+Preguntas guía:
+- ¿A quién le quieres hablar principalmente con esta idea?
+- ¿Qué problema concreto está viviendo esa persona?
+- ¿Qué pierde si no resuelve ese problema?
+- ¿Qué cree equivocadamente sobre ese problema?
+- ¿Qué verdad quieres que descubra?
+- Después de ver el contenido, ¿qué frase te gustaría que le quede en la cabeza?
+- ¿Qué quieres que haga después de ver el video?
+- ¿Cómo quieres que aparezca la marca: como experto, aliado técnico, auditor, guía o solución directa?
+- ¿Qué tono quieres: directo, irónico, dramático, educativo, premium o polémico?
+- ¿Qué formato podría funcionar mejor: destrucción de mitos, historia de transformación, POV, noticiero, auditoría, documental falso o comparación?
+
+Estructura final obligatoria (entregar siempre usando Markdown y headers en MAYÚSCULAS para cada campo):
+
+MARCA:
+[Nombre de la marca]
+
+OBJETIVO DEL CONTENIDO:
+[Objetivo claro, específico y comercial]
+
+CANAL PRINCIPAL:
+[Canal]
+
+ETAPA DEL CLIENTE:
+[TOFU / MOFU / BOFU y explicación breve]
+
+AUDIENCIA:
+[Audiencia específica]
+
+DOLOR PRINCIPAL:
+[Dolor concreto]
+
+CONSECUENCIA:
+[Qué pierde el cliente si no resuelve el problema]
+
+MITO O CREENCIA EQUIVOCADA:
+[Creencia que el contenido va a destruir]
+
+VERDAD A REVELAR:
+[Idea estratégica que debe entender la audiencia]
+
+NUEVA CREENCIA DESEADA:
+[Frase mental que debe quedar en la cabeza del cliente]
+
+ENEMIGO NARRATIVO:
+[El falso ahorro, la cotización confusa, la mala asesoría, el proveedor improvisado, la opacidad, etc.]
+
+ROL DE LA MARCA:
+[Cómo debe aparecer la marca]
+
+ACCIÓN DESEADA:
+[Qué debe hacer el espectador después de ver el contenido]
+
+TONO NARRATIVO:
+[Tono recomendado]
+
+FORMATO RECOMENDADO:
+[Formato]
+
+ÁNGULO PRINCIPAL:
+[La gran idea de la pieza]
+
+POSIBLES TÍTULOS:
+[5 títulos potentes]
+
+IDEAS DE CONTENIDO DERIVADAS:
+[5 a 10 ideas relacionadas]
+
+OBJETIVO REESCRITO EN UNA FRASE:
+"Quiero crear una pieza de contenido para [audiencia] que destruya el mito de que [mito], mostrando que en realidad [verdad], para que el cliente entienda que [nueva creencia] y tome acción: [CTA]."
+
+Regla crítica:
+Nunca te quedes en el tema superficial. Siempre busca el conflicto, el mito, la pérdida, la verdad revelada y la nueva creencia.
+
+INSTRUCCIÓN ESPECIAL:
+Cuando consideres que ya tienes información suficiente para los 11 puntos, genera la Ficha Estratégica completa y, AL FINAL de tu respuesta, escribe exactamente esta etiqueta: [FICHA_COMPLETADA]
+\`;
+
+  try {
+    const stream = client.messages.stream({
+      model: CLAUDE_MODEL,
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: messages,
+    });
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    if (currentFichaId) {
+      res.write(`data: ${JSON.stringify({ type: 'meta', ficha_id: currentFichaId })}\n\n`);
+    }
+
+    let fullResponse = '';
+
+    stream.on('text', (text) => {
+      res.write(\`data: \${JSON.stringify({ type: 'text', text })}\\n\\n\`);
+    });
+
+    stream.on('finalMessage', () => {
+      res.write(\`data: \${JSON.stringify({ type: 'done' })}\\n\\n\`);
+      res.end();
+    });
+
+    stream.on('error', (err) => {
+      console.error('[ClaudeController][chatEstratega]', err.message);
+      res.write(\`data: \${JSON.stringify({ type: 'error', error: err.message })}\\n\\n\`);
+      res.end();
+    });
+  } catch (err) {
+    console.error('[ClaudeController][chatEstratega] Init error', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// ---------------------------------------------------------------
+// GET /api/claude/fichas/:id
+// Obtener una ficha estratégica
+// ---------------------------------------------------------------
+export const getFicha = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT * FROM marketing.fichas_estrategicas WHERE id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ success: false, error: 'Ficha no encontrada' });
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    console.error('[ClaudeController][getFicha]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

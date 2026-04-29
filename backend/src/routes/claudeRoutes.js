@@ -7,6 +7,7 @@ import {
   adaptarFormatos,
   generarBrief,
   chatEstratega,
+  analizarProducto,
   getFicha,
   agenteHumor,
   agenteSeo,

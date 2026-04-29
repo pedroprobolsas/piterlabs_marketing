@@ -1,31 +1,15 @@
 import { useState } from 'react';
 import { Video } from 'lucide-react';
 import { useMarca } from '../../hooks/useMarca';
-import SmartphoneFrame from '../../components/camara/SmartphoneFrame';
 import MediaUpload from '../../components/camara/MediaUpload';
-import SkillsPanel from '../../components/camara/SkillsPanel';
 import BriefPanel from '../../components/camara/BriefPanel';
 
 export default function ProducirVideo() {
   const { marca } = useMarca();
-
-  const [media, setMedia]   = useState(null);
-  const [skills, setSkills] = useState({ captions: false, parallax: false });
-  const [captionConfig, setCaptionConfig] = useState({ text: '', style: 'viral' });
-
-  const toggleSkill = (id) => {
-    setSkills(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const handleCaptionChange = (patch) => {
-    setCaptionConfig(prev => ({ ...prev, ...patch }));
-  };
+  const [media, setMedia] = useState(null);
 
   const handleMediaChange = (newMedia) => {
     setMedia(newMedia);
-    if (newMedia?.type === 'video') {
-      setSkills(prev => ({ ...prev, parallax: false }));
-    }
   };
 
   return (
@@ -38,39 +22,25 @@ export default function ProducirVideo() {
           <h2 className="font-bebas text-[1.8rem] tracking-[3px] text-text-main">PRODUCIR VIDEO</h2>
         </div>
         <p className="font-jetbrains text-[0.7rem] text-muted">
-          Preview 9:16 con captions y parallax. Genera el Brief de Producción completo con Claude.
+          Sube el producto (opcional) y genera el Brief de Producción completo basado en las Skills activas.
         </p>
       </div>
 
-      {/* 3-column grid on large screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-[260px_320px_1fr] gap-[20px] items-start">
-
-        {/* Col 1: Smartphone frame */}
-        <div className="flex justify-center lg:justify-start">
-          <div className="w-full max-w-[260px]">
-            <SmartphoneFrame
-              media={media}
-              captionsEnabled={skills.captions}
-              captionText={captionConfig.text}
-              captionStyle={captionConfig.style}
-              parallaxEnabled={skills.parallax}
-            />
+      {/* 2-column grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-[20px] items-start">
+        
+        {/* Col 1: Upload */}
+        <div className="space-y-[16px]">
+          <div className="bg-white border border-border rounded-[14px] p-[20px]">
+            <h3 className="font-jetbrains text-[0.75rem] font-bold tracking-[1px] mb-[10px]">IMAGEN DE REFERENCIA</h3>
+            <p className="font-jetbrains text-[0.65rem] text-muted mb-[15px]">
+              Sube una foto del producto o entorno para que Claude (Vision) la analice y adapte los prompts visuales.
+            </p>
+            <MediaUpload media={media} onMediaChange={handleMediaChange} />
           </div>
         </div>
 
-        {/* Col 2: Upload + Skills */}
-        <div className="space-y-[16px]">
-          <MediaUpload media={media} onMediaChange={handleMediaChange} />
-          <SkillsPanel
-            skills={skills}
-            onToggle={toggleSkill}
-            captionConfig={captionConfig}
-            onCaptionChange={handleCaptionChange}
-            mediaType={media?.type || null}
-          />
-        </div>
-
-        {/* Col 3: Brief de Producción */}
+        {/* Col 2: Brief de Producción */}
         <BriefPanel
           marca={marca}
           mediaFile={media?.type === 'image' ? media.file : null}

@@ -340,7 +340,7 @@ export const generarGuion = async (req, res) => {
   try {
     const stream = client.messages.stream({
       model: CLAUDE_MODEL,
-      max_tokens: 2000,
+      max_tokens: 4000,
       thinking: { type: 'adaptive' },
       system: [
         {

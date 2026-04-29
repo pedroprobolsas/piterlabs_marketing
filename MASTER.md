@@ -8,7 +8,7 @@
 ## SPRINT 4 — EN PROGRESO
 
 ### B.3 — Producir Video · Generador de Brief de Producción
-**Estado:** EN SPRINT — arquitectura redefinida 2026-04-27  
+**Estado:** ENTREGADO  
 **Módulo:** `/camara` — Producir Video  
 **Descripción:**  
 El módulo /camara no es solo preview 9:16. Es un **Generador de Brief de Producción** que toma el guion del Bloque 2 + la foto del producto + el contexto de Mi Marca, y genera 5 skills de producción completas vía Claude API.
@@ -18,7 +18,7 @@ El módulo /camara no es solo preview 9:16. Es un **Generador de Brief de Produc
 **Sección izquierda** *(ya construida en Sprint 4 inicial)*:
 - Upload de foto del producto + preview 9:16 con Zero-Click Captions y Parallax VFX
 
-**Sección derecha** *(pendiente de implementar)*:
+**Sección derecha** *(ya construida)*:
 - Panel "Brief de Producción" con botón **"Generar Brief"**
 - Llama a `POST /api/claude/generar-brief` con: guion del Bloque 2 + contexto de Mi Marca + foto analizada con Claude Vision (si se subió imagen)
 - Resultado: **5 tabs** — Foto Publicitaria / Carrusel / Video Cinematográfico / Stories / Narración
@@ -145,7 +145,7 @@ Script limpio de voz en off. **Sin corchetes, sin instrucciones técnicas, sin m
 ---
 
 ### B.2 — Crear Guion · Skills de Guion Personalizables
-**Estado:** PENDIENTE APROBADO  
+**Estado:** ENTREGADO  
 **Módulo:** `/pluma` — Crear Guion  
 **Descripción:**  
 Agregar sección "Estilo Cinematográfico" en la pantalla de Crear Guion con opciones de prompt avanzado que modifican el contexto enviado a Claude:
@@ -159,8 +159,8 @@ Estas opciones se inyectan en el prompt de `generar-guion`.
 ---
 
 ### B.4 — Viralizar · App Store de Agentes
-**Estado:** PENDIENTE APROBADO  
-**Módulo:** `/rayo` — Viralizar (actualmente "Próximamente")  
+**Estado:** ENTREGADO  
+**Módulo:** `/rayo` — Viralizar
 **Descripción:**  
 Pantalla de gestión de agentes con tarjetas on/off. Cada agente procesa el guion generado en B.2:
 

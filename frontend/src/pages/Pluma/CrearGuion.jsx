@@ -12,6 +12,12 @@ export default function CrearGuion() {
 
   const [plantilla, setPlantilla] = useState('problema_solucion');
   const [tema, setTema]           = useState('');
+  
+  // Advanced options (Estilo Cinematográfico)
+  const [tipoCinematografia, setTipoCinematografia] = useState('Documental');
+  const [ritmoEdicion, setRitmoEdicion]             = useState('Medio');
+  const [referenciasVisuales, setReferenciasVisuales] = useState('');
+
   const [guion, setGuion]         = useState('');
   const [generando, setGenerando] = useState(false);
   const [copied, setCopied]       = useState(false);
@@ -71,6 +77,9 @@ export default function CrearGuion() {
           tema,
           marca_config: marca || {},
           buyer_persona: marca?.buyer_persona || null,
+          tipo_cinematografia: tipoCinematografia,
+          ritmo_edicion: ritmoEdicion,
+          referencias_visuales: referenciasVisuales,
         }),
       });
 
@@ -153,6 +162,60 @@ export default function CrearGuion() {
                   : <><Sparkles size={15} /> GENERAR</>}
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Advanced options: Estilo Cinematográfico */}
+          <div className="bg-white border border-border rounded-[14px] p-[20px_22px]">
+            <h3 className="font-jetbrains text-[0.7rem] text-text2 uppercase tracking-[1.5px] font-bold block mb-[14px]">
+              Estilo Cinematográfico <span className="text-muted lowercase tracking-normal font-normal ml-[5px]">(Opcional)</span>
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px] mb-[16px]">
+              <div>
+                <label className="font-jetbrains text-[0.65rem] text-muted mb-[6px] block">Tipo de Cinematografía</label>
+                <div className="flex gap-[6px] flex-wrap">
+                  {['Documental', 'Publicidad emocional', 'Estilo Netflix', 'Viral UGC'].map(tipo => (
+                    <button
+                      key={tipo}
+                      onClick={() => setTipoCinematografia(tipo)}
+                      className={`font-jetbrains text-[0.62rem] px-[10px] py-[6px] rounded-[6px] border transition-all cursor-pointer ${
+                        tipoCinematografia === tipo ? 'border-magenta bg-magenta-soft text-magenta' : 'border-border text-muted hover:border-text2 hover:text-text2'
+                      }`}
+                    >
+                      {tipo}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="font-jetbrains text-[0.65rem] text-muted mb-[6px] block">Ritmo de Edición</label>
+                <div className="flex gap-[6px]">
+                  {['Lento', 'Medio', 'Rápido'].map(ritmo => (
+                    <button
+                      key={ritmo}
+                      onClick={() => setRitmoEdicion(ritmo)}
+                      className={`font-jetbrains text-[0.62rem] px-[12px] py-[6px] rounded-[6px] border transition-all cursor-pointer ${
+                        ritmoEdicion === ritmo ? 'border-violet bg-violet/10 text-violet' : 'border-border text-muted hover:border-text2 hover:text-text2'
+                      }`}
+                    >
+                      {ritmo}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="font-jetbrains text-[0.65rem] text-muted mb-[6px] block">Referencias Visuales</label>
+              <input
+                type="text"
+                value={referenciasVisuales}
+                onChange={e => setReferenciasVisuales(e.target.value)}
+                placeholder="Ej: estilo Apple, cortes secos, música minimalista..."
+                className="input-base w-full font-jetbrains text-[0.75rem]"
+              />
             </div>
           </div>
 

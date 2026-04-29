@@ -50,11 +50,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           <Video size={16} className="min-w-[20px]" />
           <span>Producir Video</span>
         </NavLink>
-        <div className="flex items-center gap-[11px] px-[22px] py-[10px] text-[0.9rem] font-semibold text-muted/40 cursor-default select-none">
+        <NavLink to="/rayo" className={({isActive}) => `flex items-center gap-[11px] px-[22px] py-[10px] cursor-pointer transition-all duration-150 text-[0.9rem] font-semibold ${isActive ? 'text-magenta bg-magenta-soft font-bold relative before:content-[""] before:absolute before:left-0 before:top-[6px] before:bottom-[6px] before:w-[3px] before:bg-magenta before:rounded-r-[3px]' : 'text-text2 hover:text-magenta hover:bg-magenta-soft'}`}>
           <Zap size={16} className="min-w-[20px]" />
           <span>Viralizar</span>
-          <span className="ml-auto font-jetbrains text-[0.5rem] px-[6px] py-[1px] rounded-[4px] bg-surface border border-border text-muted/50 uppercase tracking-[1px]">Pronto</span>
-        </div>
+        </NavLink>
         <div className="flex items-center gap-[11px] px-[22px] py-[10px] text-[0.9rem] font-semibold text-muted/40 cursor-default select-none">
           <RefreshCw size={16} className="min-w-[20px]" />
           <span>Publicar y Medir</span>

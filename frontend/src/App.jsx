@@ -8,6 +8,7 @@ import Ideacion from './pages/Cerebro/Ideacion';
 import CrearGuion from './pages/Pluma/CrearGuion';
 import ProducirVideo from './pages/Camara/ProducirVideo';
 import GestionSkills from './pages/Skills/GestionSkills';
+import Viralizar from './pages/Rayo/Viralizar';
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
           <Route path="ideas"     element={<Ideacion />} />
           <Route path="pluma"     element={<CrearGuion />} />
           <Route path="camara"    element={<ProducirVideo />} />
-          <Route path="rayo"      element={<ComingSoon title="VIRALIZAR" />} />
+          <Route path="rayo"      element={<Viralizar />} />
           <Route path="engranaje" element={<ComingSoon title="PUBLICAR Y MEDIR" />} />
           <Route path="email"     element={<ComingSoon title="EMAIL MARKETING" />} />
           <Route path="settings"  element={<ComingSoon title="AJUSTES" />} />

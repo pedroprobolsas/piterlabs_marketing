@@ -226,10 +226,10 @@ Escala puntuación: 0-49 débil, 50-74 regular, 75-89 fuerte, 90-100 viral`,
 // ---------------------------------------------------------------
 // POST /api/claude/generar-guion
 // Genera un guion completo para un formato de contenido
-// Body: { plantilla, tema, marca_config, buyer_persona }
+// Body: { plantilla, tema, marca_config, buyer_persona, tipo_cinematografia, ritmo_edicion, referencias_visuales }
 // ---------------------------------------------------------------
 export const generarGuion = async (req, res) => {
-  const { plantilla, tema, marca_config, buyer_persona } = req.body;
+  const { plantilla, tema, marca_config, buyer_persona, tipo_cinematografia, ritmo_edicion, referencias_visuales } = req.body;
 
   if (!plantilla || !tema) {
     return res.status(400).json({ success: false, error: 'plantilla y tema son obligatorios' });
@@ -268,6 +268,11 @@ Siempre en español. Cada sección del guion tiene tiempo estimado y notas de di
 **Propuesta de valor:** ${marca_config?.propuesta_valor || ''}
 **Tono de voz:** ${marca_config?.tono_voz || 'profesional'}
 **Buyer persona:** ${buyer_persona ? `${buyer_persona.nombre}, ${buyer_persona.ocupacion}. Dolor: ${buyer_persona.dolor_principal}` : 'No definido'}
+
+**Estilo Cinematográfico (Instrucciones Visuales):**
+- Tipo de Cinematografía: ${tipo_cinematografia || 'Documental'}
+- Ritmo de Edición: ${ritmo_edicion || 'Medio'}
+- Referencias Visuales: ${referencias_visuales || 'No especificadas'}
 
 Estructura el guion en secciones con:
 - **[SECCIÓN]** — nombre de la sección
@@ -688,6 +693,64 @@ export const getFicha = async (req, res) => {
     res.json({ success: true, data: result.rows[0] });
   } catch (err) {
     console.error('[ClaudeController][getFicha]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// ===============================================================
+// AGENTES DE VIRALIZACIÓN
+// ===============================================================
+
+export const agenteHumor = async (req, res) => {
+  const { guion, marca_config } = req.body;
+  if (!guion) return res.status(400).json({ success: false, error: 'Guion es obligatorio' });
+  const client = getClaudeClient();
+  try {
+    const message = await client.messages.create({
+      model: CLAUDE_MODELS.RAPIDO,
+      max_tokens: 1500,
+      system: [{ type: 'text', text: 'Eres un guionista de comedia especializado en contenido B2B y marketing corporativo latinoamericano. Inyectas humor sutil, ironía y analogías graciosas sin perder el profesionalismo.', cache_control: { type: 'ephemeral' } }],
+      messages: [{ role: 'user', content: `Reescribe este guion inyectando humor, ironía o analogías curiosas. Mantén la estructura y el mensaje central.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
+    });
+    const txt = message.content.find(b => b.type === 'text')?.text || '';
+    res.json({ success: true, data: txt });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+export const agenteSeo = async (req, res) => {
+  const { guion, marca_config } = req.body;
+  if (!guion) return res.status(400).json({ success: false, error: 'Guion es obligatorio' });
+  const client = getClaudeClient();
+  try {
+    const message = await client.messages.create({
+      model: CLAUDE_MODELS.RAPIDO,
+      max_tokens: 1000,
+      system: [{ type: 'text', text: 'Eres un experto en SEO para redes sociales (TikTok, Instagram, LinkedIn).', cache_control: { type: 'ephemeral' } }],
+      messages: [{ role: 'user', content: `Analiza este guion y genera: 1) 5 Hashtags principales, 2) 3 Hashtags nicho, 3) Mejor hora de publicación sugerida para B2B Latam, 4) Título gancho para el caption.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
+    });
+    const txt = message.content.find(b => b.type === 'text')?.text || '';
+    res.json({ success: true, data: txt });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+export const agenteReproposito = async (req, res) => {
+  const { guion, marca_config } = req.body;
+  if (!guion) return res.status(400).json({ success: false, error: 'Guion es obligatorio' });
+  const client = getClaudeClient();
+  try {
+    const message = await client.messages.create({
+      model: CLAUDE_MODELS.PRINCIPAL,
+      max_tokens: 3000,
+      system: [{ type: 'text', text: 'Eres un experto en content repurposing. Tu misión es tomar un guion largo y fragmentarlo en 5 piezas de microcontenido altamente virales.', cache_control: { type: 'ephemeral' } }],
+      messages: [{ role: 'user', content: `Toma este guion y divídelo en 5 piezas cortas (ej: 3 Tweets/Threads cortos, 1 frase citada para LinkedIn, 1 Short directo). Cada pieza debe sostenerse por sí sola.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
+    });
+    const txt = message.content.find(b => b.type === 'text')?.text || '';
+    res.json({ success: true, data: txt });
+  } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };

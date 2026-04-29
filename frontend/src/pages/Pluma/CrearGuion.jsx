@@ -11,17 +11,20 @@ export default function CrearGuion() {
   const { marca } = useMarca();
 
   const [plantilla, setPlantilla] = useState('problema_solucion');
-  const [tema, setTema]           = useState('');
+  const [tema, setTema]           = useState(() => localStorage.getItem('piterlabs_guion_tema') || '');
   
   // Advanced options (Estilo Cinematográfico)
   const [tipoCinematografia, setTipoCinematografia] = useState('Documental');
   const [ritmoEdicion, setRitmoEdicion]             = useState('Medio');
   const [referenciasVisuales, setReferenciasVisuales] = useState('');
 
-  const [guion, setGuion]         = useState('');
+  // Recuperar guion anterior al navegar de vuelta (persiste hasta "Nuevo Contenido")
+  const [guion, setGuion]         = useState(() => localStorage.getItem('piterlabs_guion_reciente') || '');
   const [generando, setGenerando] = useState(false);
   const [copied, setCopied]       = useState(false);
-  const [activeSection, setActiveSection] = useState('guion'); // 'guion' | 'formatos'
+  const [activeSection, setActiveSection] = useState(() => 
+    localStorage.getItem('piterlabs_guion_reciente') ? 'guion' : 'guion'
+  );
   const guionRef = useRef(null);
 
   const [searchParams] = useSearchParams();
@@ -62,10 +65,24 @@ export default function CrearGuion() {
     }
   }, [guion, generando]);
 
+  // Persistir el tema para que sobreviva la navegación
+  useEffect(() => {
+    if (tema) localStorage.setItem('piterlabs_guion_tema', tema);
+  }, [tema]);
+
   // Persistir estilo cinematográfico elegido para uso en /camara
   useEffect(() => {
     localStorage.setItem('piterlabs_estilo_cinematografico', tipoCinematografia);
   }, [tipoCinematografia]);
+
+  // Limpiar toda la sesión actual (llamado desde botón "+ Nuevo Contenido")
+  const handleNuevoContenido = () => {
+    localStorage.removeItem('piterlabs_guion_reciente');
+    localStorage.removeItem('piterlabs_guion_tema');
+    localStorage.removeItem('piterlabs_ideas_recientes');
+    setGuion('');
+    setTema('');
+  };
 
   const handleGenerarGuion = async () => {
     if (!tema.trim()) return;

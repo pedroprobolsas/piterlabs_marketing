@@ -751,7 +751,7 @@ export const agenteHumor = async (req, res) => {
   try {
     const message = await client.messages.create({
       model: CLAUDE_MODELS.RAPIDO,
-      max_tokens: 1500,
+      max_tokens: 8000,
       system: [{ type: 'text', text: 'Eres un guionista de comedia especializado en contenido B2B y marketing corporativo latinoamericano. Inyectas humor sutil, ironía y analogías graciosas sin perder el profesionalismo.', cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: `Reescribe este guion inyectando humor, ironía o analogías curiosas. Mantén la estructura y el mensaje central.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
     });
@@ -769,7 +769,7 @@ export const agenteSeo = async (req, res) => {
   try {
     const message = await client.messages.create({
       model: CLAUDE_MODELS.RAPIDO,
-      max_tokens: 1000,
+      max_tokens: 2000,
       system: [{ type: 'text', text: 'Eres un experto en SEO para redes sociales (TikTok, Instagram, LinkedIn).', cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: `Analiza este guion y genera: 1) 5 Hashtags principales, 2) 3 Hashtags nicho, 3) Mejor hora de publicación sugerida para B2B Latam, 4) Título gancho para el caption.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
     });
@@ -787,7 +787,7 @@ export const agenteReproposito = async (req, res) => {
   try {
     const message = await client.messages.create({
       model: CLAUDE_MODELS.PRINCIPAL,
-      max_tokens: 3000,
+      max_tokens: 8000,
       system: [{ type: 'text', text: 'Eres un experto en content repurposing. Tu misión es tomar un guion largo y fragmentarlo en 5 piezas de microcontenido altamente virales.', cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: `Toma este guion y divídelo en 5 piezas cortas (ej: 3 Tweets/Threads cortos, 1 frase citada para LinkedIn, 1 Short directo). Cada pieza debe sostenerse por sí sola.\n\nMarca: ${marca_config?.nombre_marca || 'No definida'}\n\nGUION:\n${guion}` }]
     });

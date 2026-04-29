@@ -665,9 +665,10 @@ export const chatEstratega = async (req, res) => {
   let currentFichaId = ficha_id;
   try {
     if (!currentFichaId) {
+      const brandId = marca_config?.id || null;
       const result = await pool.query(
         'INSERT INTO marketing.fichas_estrategicas (brand_profile_id, conversacion) VALUES ($1, $2) RETURNING id',
-        [marca_config?.id || null, JSON.stringify(messages)]
+        [brandId, JSON.stringify(messages)]
       );
       currentFichaId = result.rows[0].id;
     }

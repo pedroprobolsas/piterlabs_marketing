@@ -56,6 +56,9 @@ export default function Ideacion() {
 
     try {
       const b64 = await fileToBase64(file);
+      // Persistir la imagen para que ProducirVideo la use automáticamente
+      localStorage.setItem('estratega_imagen', b64);
+
       const res = await fetch('/api/claude/analizar-producto', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

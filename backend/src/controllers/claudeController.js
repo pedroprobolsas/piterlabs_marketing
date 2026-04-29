@@ -500,59 +500,66 @@ ${skillsPrompt}`,
     return `- ${s.clave}: string`;
   }).join('\n');
 
-  try {
-    const message = await client.messages.create({
-      model: CLAUDE_MODELS.PRINCIPAL,
-      max_tokens: 8000,
-      system: [
-        {
-          type: 'text',
-          text: `Eres un experto en producción de contenido para redes sociales.
+  const maxRetries = 2;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const message = await client.messages.create({
+        model: CLAUDE_MODELS.PRINCIPAL,
+        max_tokens: 8000,
+        system: [
+          {
+            type: 'text',
+            text: `Eres un experto en producción de contenido para redes sociales.
 REGLA ABSOLUTA: Responde ÚNICAMENTE con un objeto JSON válido.
 Sin texto antes. Sin texto después. Sin markdown. Sin backticks. Sin explicaciones.
 El JSON debe tener exactamente estas ${skills.length} claves:
 ${jsonSchema}
 Dentro de los strings, nunca uses comillas dobles. Usa comillas simples si necesitas citar algo.`,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
-      messages: [{ role: 'user', content: userContent }],
-    });
+            cache_control: { type: 'ephemeral' },
+          },
+        ],
+        messages: [
+          { role: 'user', content: userContent },
+          { role: 'assistant', content: '{' },
+        ],
+      });
 
-    const textBlock = message.content.find(b => b.type === 'text');
-    if (!textBlock) {
-      return res.status(500).json({ success: false, error: 'Sin respuesta de texto' });
+      const textBlock = message.content.find(b => b.type === 'text');
+      if (!textBlock) {
+        if (attempt < maxRetries) { console.warn(`[generarBrief] Sin texto, reintento ${attempt}`); continue; }
+        return res.status(500).json({ success: false, error: 'Sin respuesta de texto' });
+      }
+
+      // Prefill: ya mandamos '{' como inicio, Claude continúa desde ahí
+      const raw = ('{' + textBlock.text).trim()
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/```\s*$/i, '');
+
+      console.log('[generarBrief] raw text (500):', raw.substring(0, 500));
+      const jsonStart = raw.indexOf('{');
+      const jsonEnd   = raw.lastIndexOf('}');
+      if (jsonStart === -1 || jsonEnd === -1) {
+        console.error('[ClaudeController][generarBrief] Sin objeto JSON — raw:', raw.substring(0, 1000));
+        if (attempt < maxRetries) { console.warn(`[generarBrief] Reintento ${attempt}...`); continue; }
+        return res.status(500).json({ success: false, error: 'Claude no devolvió un objeto JSON. Intenta de nuevo.' });
+      }
+      const jsonStr = raw.slice(jsonStart, jsonEnd + 1);
+
+      console.log('[generarBrief] jsonStr (500):', jsonStr.substring(0, 500));
+      try {
+        const brief = JSON.parse(jsonrepair(jsonStr));
+        return res.json({ success: true, data: brief });
+      } catch (parseErr) {
+        console.error('[ClaudeController][generarBrief] Parse error intento', attempt, ':', parseErr.message);
+        if (attempt < maxRetries) continue;
+        return res.status(500).json({ success: false, error: 'Claude devolvió JSON irrecuperable. Intenta de nuevo.' });
+      }
+    } catch (err) {
+      console.error('[ClaudeController][generarBrief]', err.message);
+      if (attempt < maxRetries) continue;
+      return res.status(500).json({ success: false, error: err.message });
     }
-
-    // Extraer el bloque JSON — strip markdown fences si Claude las incluyó
-    const raw = textBlock.text.trim()
-      .replace(/^```json\s*/i, '')
-      .replace(/^```\s*/i, '')
-      .replace(/```\s*$/i, '');
-
-    console.log('[generarBrief] raw text (500):', raw.substring(0, 500));
-    const jsonStart = raw.indexOf('{');
-    const jsonEnd   = raw.lastIndexOf('}');
-    if (jsonStart === -1 || jsonEnd === -1) {
-      console.error('[ClaudeController][generarBrief] Sin objeto JSON — raw completo:', raw.substring(0, 1000));
-      return res.status(500).json({ success: false, error: 'Claude no devolvió un objeto JSON. Intenta de nuevo.' });
-    }
-    const jsonStr = raw.slice(jsonStart, jsonEnd + 1);
-
-    console.log('[generarBrief] raw:', jsonStr.substring(0, 500));
-    try {
-      // jsonrepair corrige comillas sin escapar, comas sobrantes, newlines
-      // literales y otras deformaciones comunes en respuestas de LLMs
-      const brief = JSON.parse(jsonrepair(jsonStr));
-      res.json({ success: true, data: brief });
-    } catch (parseErr) {
-      console.error('[ClaudeController][generarBrief] Parse irrecuperable:', parseErr.message);
-      console.error('[ClaudeController][generarBrief] jsonStr[0:500]:', jsonStr.slice(0, 500));
-      return res.status(500).json({ success: false, error: 'Claude devolvió JSON irrecuperable. Intenta de nuevo.' });
-    }
-  } catch (err) {
-    console.error('[ClaudeController][generarBrief]', err.message);
-    res.status(500).json({ success: false, error: err.message });
   }
 };
 

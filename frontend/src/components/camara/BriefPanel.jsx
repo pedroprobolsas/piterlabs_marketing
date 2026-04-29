@@ -49,7 +49,7 @@ export default function BriefPanel({ marca, mediaFile }) {
       .then(r => r.json())
       .then(json => {
         if (json.success) {
-          const active = json.data.filter(s => s.activa);
+          const active = json.data.filter(s => s.activa && s.clave !== 'estratega_interactivo');
           setSkills(active);
           if (active.length > 0) setActiveTab(active[0].clave);
         }

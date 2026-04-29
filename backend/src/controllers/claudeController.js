@@ -518,10 +518,7 @@ Dentro de los strings, nunca uses comillas dobles. Usa comillas simples si neces
             cache_control: { type: 'ephemeral' },
           },
         ],
-        messages: [
-          { role: 'user', content: userContent },
-          { role: 'assistant', content: '{' },
-        ],
+        messages: [{ role: 'user', content: userContent }],
       });
 
       const textBlock = message.content.find(b => b.type === 'text');
@@ -530,8 +527,8 @@ Dentro de los strings, nunca uses comillas dobles. Usa comillas simples si neces
         return res.status(500).json({ success: false, error: 'Sin respuesta de texto' });
       }
 
-      // Prefill: ya mandamos '{' como inicio, Claude continúa desde ahí
-      const raw = ('{' + textBlock.text).trim()
+      // Extraer el bloque JSON — strip markdown fences si Claude las incluyó
+      const raw = textBlock.text.trim()
         .replace(/^```json\s*/i, '')
         .replace(/^```\s*/i, '')
         .replace(/```\s*$/i, '');

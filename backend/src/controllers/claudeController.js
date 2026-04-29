@@ -794,7 +794,7 @@ Nunca te quedes en el tema superficial. Siempre busca el conflicto, el mito, la 
 
 INSTRUCCIÓN ESPECIAL:
 Cuando consideres que ya tienes información suficiente para los 11 puntos, genera la Ficha Estratégica completa y, AL FINAL de tu respuesta, escribe exactamente esta etiqueta: [FICHA_COMPLETADA]
-\`;
+`;
 
   try {
     const stream = client.messages.stream({
@@ -815,17 +815,32 @@ Cuando consideres que ya tienes información suficiente para los 11 puntos, gene
     let fullResponse = '';
 
     stream.on('text', (text) => {
-      res.write(\`data: \${JSON.stringify({ type: 'text', text })}\\n\\n\`);
+      fullResponse += text;
+      res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`);
     });
 
-    stream.on('finalMessage', () => {
-      res.write(\`data: \${JSON.stringify({ type: 'done' })}\\n\\n\`);
+    stream.on('finalMessage', async () => {
+      res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
       res.end();
+
+      if (currentFichaId) {
+        try {
+          const updatedMessages = [...messages, { role: 'assistant', content: fullResponse }];
+          const isCompletada = fullResponse.includes('[FICHA_COMPLETADA]');
+          const estado = isCompletada ? 'completada' : 'en_progreso';
+          await pool.query(
+            'UPDATE marketing.fichas_estrategicas SET conversacion = $1, estado = $2 WHERE id = $3',
+            [JSON.stringify(updatedMessages), estado, currentFichaId]
+          );
+        } catch (dbErr) {
+          console.error('[ClaudeController][chatEstratega] DB Save Error:', dbErr.message);
+        }
+      }
     });
 
     stream.on('error', (err) => {
       console.error('[ClaudeController][chatEstratega]', err.message);
-      res.write(\`data: \${JSON.stringify({ type: 'error', error: err.message })}\\n\\n\`);
+      res.write(`data: ${JSON.stringify({ type: 'error', error: err.message })}\n\n`);
       res.end();
     });
   } catch (err) {

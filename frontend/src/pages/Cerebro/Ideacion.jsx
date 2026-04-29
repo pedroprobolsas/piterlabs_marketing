@@ -41,6 +41,12 @@ export default function Ideacion() {
         }),
       });
 
+      if (!res.ok) {
+        let errMsg = 'Error en el servidor';
+        try { const errData = await res.json(); errMsg = errData.error || errMsg; } catch {}
+        throw new Error(errMsg);
+      }
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       

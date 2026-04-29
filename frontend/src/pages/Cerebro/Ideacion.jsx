@@ -6,11 +6,25 @@ import { useNavigate } from 'react-router-dom';
 export default function Ideacion() {
   const { marca } = useMarca();
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem('estratega_messages');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [fichaId, setFichaId] = useState(null);
+  const [fichaId, setFichaId] = useState(() => {
+    return localStorage.getItem('estratega_fichaId') || null;
+  });
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem('estratega_messages', JSON.stringify(messages));
+  }, [messages]);
+
+  useEffect(() => {
+    if (fichaId) localStorage.setItem('estratega_fichaId', fichaId);
+    else localStorage.removeItem('estratega_fichaId');
+  }, [fichaId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -119,6 +133,8 @@ export default function Ideacion() {
               onClick={() => {
                 setMessages([]);
                 setFichaId(null);
+                localStorage.removeItem('estratega_messages');
+                localStorage.removeItem('estratega_fichaId');
               }}
               className="font-jetbrains text-[0.6rem] text-muted border border-border rounded-[6px] px-[9px] py-[5px] hover:text-red hover:border-red/50 transition-all cursor-pointer bg-white flex items-center gap-[5px]"
             >

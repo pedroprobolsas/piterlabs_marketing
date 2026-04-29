@@ -809,18 +809,18 @@ Cuando consideres que ya tienes información suficiente para los 11 puntos, gene
     res.setHeader('Connection', 'keep-alive');
 
     if (currentFichaId) {
-      res.write(`data: ${JSON.stringify({ type: 'meta', ficha_id: currentFichaId })}\n\n`);
+      res.write('data: ' + JSON.stringify({ type: 'meta', ficha_id: currentFichaId }) + '\n\n');
     }
 
     let fullResponse = '';
 
     stream.on('text', (text) => {
       fullResponse += text;
-      res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`);
+      res.write('data: ' + JSON.stringify({ type: 'text', text }) + '\n\n');
     });
 
     stream.on('finalMessage', async () => {
-      res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+      res.write('data: ' + JSON.stringify({ type: 'done' }) + '\n\n');
       res.end();
 
       if (currentFichaId) {
@@ -840,7 +840,7 @@ Cuando consideres que ya tienes información suficiente para los 11 puntos, gene
 
     stream.on('error', (err) => {
       console.error('[ClaudeController][chatEstratega]', err.message);
-      res.write(`data: ${JSON.stringify({ type: 'error', error: err.message })}\n\n`);
+      res.write('data: ' + JSON.stringify({ type: 'error', error: err.message }) + '\n\n');
       res.end();
     });
   } catch (err) {

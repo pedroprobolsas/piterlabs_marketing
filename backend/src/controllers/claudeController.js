@@ -790,11 +790,36 @@ IDEAS DE CONTENIDO DERIVADAS:
 OBJETIVO REESCRITO EN UNA FRASE:
 "Quiero crear una pieza de contenido para [audiencia] que destruya el mito de que [mito], mostrando que en realidad [verdad], para que el cliente entienda que [nueva creencia] y tome acción: [CTA]."
 
+## BRIDGE CINEMATOGRÁFICO (Arquitectura visual del video):
+
+ESCENA INICIAL:
+[Imagen visual exacta que abre el video. Específico: qué vemos, dónde, cuándo. Ejemplo: "Plano cenital de una góndola de supermercado. Mano de un consumidor joven pasando por encima de un empaque tradicional sin detenerse."]
+
+CONFLICTO VISUAL:
+[Qué vemos en pantalla que demuestra el problema sin que nadie lo explique. Mostrar, no decir. Máximo 2 frases.]
+
+GIRO O REVELACIÓN:
+[Momento exacto donde la interpretación del espectador cambia. Puede ser un dato, un corte de cámara, un cambio de ángulo. Define el segundo aproximado: "En el segundo 12, la cámara revela que..."]
+
+RESOLUCIÓN:
+[Cómo entra la marca en escena sin sonar vendedora. Debe ser autoridad, no pitch. Ejemplo: "Voz en off: 'Hemos visto pasar por nuestras máquinas a más de 200 marcas...'"]
+
+CTA SUAVE:
+[Acción concreta pero natural. NO "reflexiona". SÍ "descarga la guía", "agenda una auditoría", "ve el caso de [marca]". El CTA debe ser un próximo paso accionable, NO un sentimiento.]
+
+Reglas para el agente al generar este bloque:
+- La escena inicial debe ser visual-ejecutable, no abstracta
+- El conflicto visual debe demostrar el dolor sin diálogo
+- La resolución debe usar el ROL DE LA MARCA definido arriba
+- El CTA suave NO puede ser "reflexionar" o "considerar". Debe ser una acción específica
+
+No agregues nuevas preguntas al usuario. El agente debe deducir estos 5 campos de la información ya recopilada en la conversación previa. Si te faltara algún dato, puedes hacer una sola pregunta final tipo: "Antes de armar la ficha, ¿qué CTA específico quieres que tenga el video? Por ejemplo: agendar una auditoría gratuita, descargar una guía, ver casos reales..."
+
 Regla crítica:
 Nunca te quedes en el tema superficial. Siempre busca el conflicto, el mito, la pérdida, la verdad revelada y la nueva creencia.
 
 INSTRUCCIÓN ESPECIAL:
-Cuando consideres que ya tienes información suficiente para los 11 puntos, genera la Ficha Estratégica completa y, AL FINAL de tu respuesta, escribe exactamente esta etiqueta: [FICHA_COMPLETADA]
+Cuando consideres que ya tienes información suficiente para todos los puntos anteriores y el Bridge Cinematográfico, genera la Ficha Estratégica completa y, AL FINAL de tu respuesta, escribe exactamente esta etiqueta: [FICHA_COMPLETADA]
 `;
 
   try {

@@ -70,27 +70,46 @@ Escribe SOLO el prompt visual en inglés, max 100 palabras. Asegúrate de inclui
         model: "gpt-image-2",
         prompt: dallEPrompt + " (Wide shot, cinematic lighting)",
         size: "1792x1024",
-        response_format: "b64_json",
         n: 1,
       }).catch(e => ({ error: e.message })),
       openai.images.generate({
         model: "gpt-image-2",
         prompt: dallEPrompt + " (Vertical shot, ideal for TikTok/Reels, cinematic lighting)",
         size: "1024x1792",
-        response_format: "b64_json",
         n: 1,
       }).catch(e => ({ error: e.message }))
     ]);
 
+    const extractUrl = (res) => {
+      if (!res || res.error) return null;
+      if (res.data && Array.isArray(res.data) && res.data[0]) {
+        if (res.data[0].url) return res.data[0].url;
+        if (res.data[0].b64_json) return `data:image/png;base64,${res.data[0].b64_json}`;
+      }
+      if (res.url) return res.url;
+      // Defensive string matching if format is totally weird
+      const match = JSON.stringify(res).match(/"(https?:\/\/[^"]+)"/);
+      return match ? match[1] : null;
+    };
+
     const result = {
       prompt_usado: dallEPrompt,
-      imagen_16_9: resWide.data ? `data:image/png;base64,${resWide.data[0].b64_json}` : null,
-      imagen_9_16: resVertical.data ? `data:image/png;base64,${resVertical.data[0].b64_json}` : null,
+      imagen_16_9: extractUrl(resWide),
+      imagen_9_16: extractUrl(resVertical),
       errores: []
     };
 
-    if (resWide.error) result.errores.push(`Error 16:9: ${resWide.error}`);
-    if (resVertical.error) result.errores.push(`Error 9:16: ${resVertical.error}`);
+    if (resWide.error) {
+      result.errores.push(`Error 16:9: ${resWide.error}`);
+    } else if (!result.imagen_16_9) {
+      result.errores.push(`16:9 OK pero formato raro: ${JSON.stringify(resWide).substring(0, 100)}...`);
+    }
+
+    if (resVertical.error) {
+      result.errores.push(`Error 9:16: ${resVertical.error}`);
+    } else if (!result.imagen_9_16) {
+      result.errores.push(`9:16 OK pero formato raro: ${JSON.stringify(resVertical).substring(0, 100)}...`);
+    }
 
     res.json({ success: true, data: result });
   } catch (err) {

@@ -59,9 +59,12 @@ export default function CrearGuion() {
   }, [fichaId]);
 
   // Guardar en localStorage cuando se termina de generar
+  // piterlabs_guion_reciente → persistencia general de sesión
+  // piterlabs_guion_activo  → señal para ProducirVideo de que hay un guion recién generado
   useEffect(() => {
     if (!generando && guion) {
       localStorage.setItem('piterlabs_guion_reciente', guion);
+      localStorage.setItem('piterlabs_guion_activo', guion);
     }
   }, [guion, generando]);
 
@@ -78,6 +81,7 @@ export default function CrearGuion() {
   // Limpiar toda la sesión actual (llamado desde botón "+ Nuevo Contenido")
   const handleNuevoContenido = () => {
     localStorage.removeItem('piterlabs_guion_reciente');
+    localStorage.removeItem('piterlabs_guion_activo');
     localStorage.removeItem('piterlabs_guion_tema');
     localStorage.removeItem('piterlabs_ideas_recientes');
     setGuion('');

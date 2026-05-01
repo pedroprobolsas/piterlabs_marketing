@@ -34,9 +34,17 @@ function CopyButton({ text }) {
 }
 
 export default function BriefPanel({ marca, mediaFile }) {
-  const [guion, setGuion]     = useState(() => {
-    return localStorage.getItem('piterlabs_guion_reciente') || '';
+  // piterlabs_guion_activo tiene prioridad: es la señal de que hay un guion recién generado
+  // en Crear Guion. Si no existe, cae en piterlabs_guion_reciente (persistencia general).
+  const [guion, setGuion] = useState(() => {
+    return localStorage.getItem('piterlabs_guion_activo')
+      || localStorage.getItem('piterlabs_guion_reciente')
+      || '';
   });
+  // Indica si el guion fue pre-cargado automáticamente desde Crear Guion
+  const [autoLoaded, setAutoLoaded] = useState(
+    () => !!localStorage.getItem('piterlabs_guion_activo')
+  );
   const estiloCinematografico = localStorage.getItem('piterlabs_estilo_cinematografico') || 'Publicidad Emocional';
   const [loading, setLoading]   = useState(false);
   const [brief, setBrief]       = useState(null);
@@ -60,6 +68,15 @@ export default function BriefPanel({ marca, mediaFile }) {
   }, []);
 
   // Guardar cambios del textarea en localStorage
+  // Al primer cambio manual, consumir piterlabs_guion_activo y ocultar el badge
+  const handleGuionChange = (e) => {
+    setGuion(e.target.value);
+    if (autoLoaded) {
+      setAutoLoaded(false);
+      localStorage.removeItem('piterlabs_guion_activo');
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem('piterlabs_guion_reciente', guion);
   }, [guion]);
@@ -153,11 +170,21 @@ export default function BriefPanel({ marca, mediaFile }) {
           </label>
           <textarea
             value={guion}
-            onChange={e => setGuion(e.target.value)}
+            onChange={handleGuionChange}
             placeholder="Pega aquí el guion generado en Crear Guion…"
             rows={7}
             className="input-base resize-none text-[0.72rem] leading-relaxed"
           />
+          {/* Badge de pre-carga automática */}
+          {autoLoaded && (
+            <div className="flex items-center gap-[5px] mt-[6px]">
+              <span className="inline-flex items-center gap-[5px] font-jetbrains text-[0.6rem] text-violet bg-violet/10 border border-violet/25 rounded-full px-[9px] py-[3px]">
+                ✨ Guion cargado desde Creación de Guion
+              </span>
+              <span className="font-jetbrains text-[0.57rem] text-muted">· Edítalo o bórralo libremente
+              </span>
+            </div>
+          )}
           {mediaFile?.type.startsWith('image/') && (
             <p className="font-jetbrains text-[0.6rem] text-violet mt-[5px]">
               ✦ Imagen del producto incluida — Claude usará Vision para analizarla

@@ -227,6 +227,9 @@ Escala puntuación: 0-49 débil, 50-74 regular, 75-89 fuerte, 90-100 viral`,
 // POST /api/claude/generar-guion
 // Genera un guion completo para un formato de contenido
 // Body: { plantilla, tema, marca_config, buyer_persona, tipo_cinematografia, ritmo_edicion, referencias_visuales }
+// El system prompt se carga dinámicamente desde marketing.skills (clave: guion_grafico).
+// Si el tema contiene [FICHA_COMPLETADA], se omite la selección de plantilla del frontend
+// y se usa el contenido completo de la ficha como contexto estratégico.
 // ---------------------------------------------------------------
 export const generarGuion = async (req, res) => {
   const { plantilla, tema, marca_config, buyer_persona, tipo_cinematografia, ritmo_edicion, referencias_visuales } = req.body;
@@ -234,6 +237,14 @@ export const generarGuion = async (req, res) => {
   if (!plantilla || !tema) {
     return res.status(400).json({ success: false, error: 'plantilla y tema son obligatorios' });
   }
+
+  const FALLBACK_SYSTEM_PROMPT = `Eres un guionista experto en contenido de video corto y largo para marcas latinoamericanas.
+Creas guiones estructurados, persuasivos y adaptados al tono de cada marca.
+Siempre en español. Cada sección del guion tiene tiempo estimado y notas de dirección.`;
+
+  // Cargar system prompt desde la skill 'guion_grafico' con fallback al hardcodeado
+  const systemPromptText = await getAgenteSkill('guion_grafico', FALLBACK_SYSTEM_PROMPT);
+  console.log('[generarGuion] system prompt source:', systemPromptText === FALLBACK_SYSTEM_PROMPT ? 'FALLBACK' : 'DB skill guion_grafico');
 
   const client = getClaudeClient();
 
@@ -243,6 +254,13 @@ export const generarGuion = async (req, res) => {
     storytelling: 'Historia de transformación: narrativa emocional con personaje, conflicto y resolución',
   };
 
+  // Si el tema viene de una Ficha Estratégica completada, ignorar la plantilla del frontend
+  // y dejar que la ficha defina el framework narrativo
+  const fichaCompletada = tema.includes('[FICHA_COMPLETADA]');
+  const plantillaLine = fichaCompletada
+    ? '**Contexto estratégico:** El tema anterior proviene de una Ficha Estratégica completada. Extrae el framework narrativo, el gancho y la estructura directamente de la ficha. Ignora cualquier plantilla predefinida.'
+    : `**Plantilla:** ${plantillaDescripciones[plantilla] || plantilla}`;
+
   try {
     const stream = client.messages.stream({
       model: CLAUDE_MODELS.PRINCIPAL,
@@ -251,9 +269,7 @@ export const generarGuion = async (req, res) => {
       system: [
         {
           type: 'text',
-          text: `Eres un guionista experto en contenido de video corto y largo para marcas latinoamericanas.
-Creas guiones estructurados, persuasivos y adaptados al tono de cada marca.
-Siempre en español. Cada sección del guion tiene tiempo estimado y notas de dirección.`,
+          text: systemPromptText,
           cache_control: { type: 'ephemeral' },
         },
       ],
@@ -263,7 +279,7 @@ Siempre en español. Cada sección del guion tiene tiempo estimado y notas de di
           content: `Genera un guion de contenido completo:
 
 **Tema:** ${tema}
-**Plantilla:** ${plantillaDescripciones[plantilla] || plantilla}
+${plantillaLine}
 **Marca:** ${marca_config?.nombre_marca || 'No especificada'} — ${marca_config?.industria || ''}
 **Propuesta de valor:** ${marca_config?.propuesta_valor || ''}
 **Tono de voz:** ${marca_config?.tono_voz || 'profesional'}

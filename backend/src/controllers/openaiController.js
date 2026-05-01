@@ -70,48 +70,24 @@ Escribe SOLO el prompt visual en inglés, max 100 palabras. Asegúrate de inclui
         model: "gpt-image-2",
         prompt: dallEPrompt + " (Wide shot, cinematic lighting)",
         size: "1792x1024",
+        response_format: "b64_json",
         n: 1,
       }).catch(e => ({ error: e.message })),
       openai.images.generate({
         model: "gpt-image-2",
         prompt: dallEPrompt + " (Vertical shot, ideal for TikTok/Reels, cinematic lighting)",
         size: "1024x1792",
+        response_format: "b64_json",
         n: 1,
       }).catch(e => ({ error: e.message }))
     ]);
 
-    console.log('[OpenAIController] resWide:', JSON.stringify(resWide, null, 2));
-    console.log('[OpenAIController] resVertical:', JSON.stringify(resVertical, null, 2));
-
-    // Función auxiliar para extraer la URL de forma defensiva (diferentes estructuras)
-    const extractUrl = (res) => {
-      if (!res) return null;
-      if (res.error) return null;
-      if (res.data && Array.isArray(res.data) && res.data[0]) {
-        return res.data[0].url || res.data[0].b64_json || res.data[0];
-      }
-      if (res.url) return res.url;
-      // Intento de buscar cualquier string que parezca URL o base64
-      const str = JSON.stringify(res);
-      const urlMatch = str.match(/"(https?:\/\/[^"]+)"/);
-      if (urlMatch) return urlMatch[1];
-      return null;
-    };
-
     const result = {
       prompt_usado: dallEPrompt,
-      imagen_16_9: extractUrl(resWide),
-      imagen_9_16: extractUrl(resVertical),
+      imagen_16_9: resWide.data ? `data:image/png;base64,${resWide.data[0].b64_json}` : null,
+      imagen_9_16: resVertical.data ? `data:image/png;base64,${resVertical.data[0].b64_json}` : null,
       errores: []
     };
-
-    // Agregar mensaje de error si no se pudo extraer imagen pero tampoco hay res.error explícito
-    if (!result.imagen_16_9 && !resWide.error) {
-       result.errores.push(`Error 16:9: Respuesta desconocida o vacía del servidor.`);
-    }
-    if (!result.imagen_9_16 && !resVertical.error) {
-       result.errores.push(`Error 9:16: Respuesta desconocida o vacía del servidor.`);
-    }
 
     if (resWide.error) result.errores.push(`Error 16:9: ${resWide.error}`);
     if (resVertical.error) result.errores.push(`Error 9:16: ${resVertical.error}`);

@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 // ---------------------------------------------------------------
 // POST /api/openai/generar-miniatura
-// Genera dos miniaturas (16:9 y 9:16) usando Claude para el prompt y OpenAI (DALL-E 3) para la imagen
+// Genera dos miniaturas (16:9 y 9:16) usando Claude para el prompt y OpenAI (gpt-image-2) para la imagen
 // Body: { guion, atributos_producto, marca_config }
 // ---------------------------------------------------------------
 export const generarMiniatura = async (req, res) => {
@@ -32,7 +32,7 @@ export const generarMiniatura = async (req, res) => {
 - Funcionalidad: ${atributos_producto.funcionalidad || 'N/A'}` : 'Sin producto específico detectado.';
 
     const systemPrompt = `Eres un Director de Arte y Experto en Miniaturas Virales de YouTube/TikTok. 
-Tu tarea es leer el guion y el contexto de la marca para generar un PROMPT EXACTO en inglés para un modelo generador de imágenes (DALL-E 3).
+Tu tarea es leer el guion y el contexto de la marca para generar un PROMPT EXACTO en inglés para un modelo generador de imágenes de producto (gpt-image-2).
 El prompt debe describir una composición visual hiper-impactante, realista y muy llamativa.
 Debe incluir: composición, ángulos de cámara, iluminación, paleta de colores (basada en la marca), y detalles del producto.
 IMPORTANTE: NO devuelvas ninguna explicación, saludos ni markdown. Devuelve SOLO el texto del prompt en inglés.`;
@@ -64,17 +64,17 @@ Escribe SOLO el prompt visual en inglés, max 100 palabras. Asegúrate de inclui
     }
 
     // 2. Llamar a OpenAI en paralelo para los dos formatos (16:9 y 9:16)
-    // DALL-E 3 soporta 1024x1024, 1024x1792 (9:16) y 1792x1024 (16:9)
+    // Usando el modelo gpt-image-2 para fotografía publicitaria
     const [resWide, resVertical] = await Promise.all([
       openai.images.generate({
-        model: "dall-e-3",
+        model: "gpt-image-2",
         prompt: dallEPrompt + " (Wide shot, cinematic lighting)",
         size: "1792x1024",
         response_format: "b64_json",
         n: 1,
       }).catch(e => ({ error: e.message })),
       openai.images.generate({
-        model: "dall-e-3",
+        model: "gpt-image-2",
         prompt: dallEPrompt + " (Vertical shot, ideal for TikTok/Reels, cinematic lighting)",
         size: "1024x1792",
         response_format: "b64_json",

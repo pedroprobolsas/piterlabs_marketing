@@ -338,7 +338,7 @@ export default function ProducirVideo() {
               <RefreshCw size={32} className="text-magenta animate-spin" />
               <p className="font-jetbrains text-[0.7rem] text-muted text-center leading-relaxed">
                 <strong className="text-text-main block mb-[4px]">Paso 1: Claude está diseñando el prompt visual perfecto...</strong>
-                Paso 2: OpenAI (DALL-E 3) generará dos imágenes reales en alta resolución.
+                Paso 2: OpenAI (gpt-image-2) generará dos imágenes reales en alta resolución.
               </p>
             </div>
           )}

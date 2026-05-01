@@ -12,6 +12,7 @@ import {
   agenteHumor,
   agenteSeo,
   agenteReproposito,
+  generarSkill,
 } from '../controllers/claudeController.js';
 
 const router = Router();
@@ -22,6 +23,7 @@ router.post('/validar-hook',       validarHook);
 router.post('/generar-guion',      generarGuion);
 router.post('/adaptar-formatos',   adaptarFormatos);
 router.post('/generar-brief',      generarBrief);
+router.post('/generar-skill',      generarSkill);
 router.post('/chat-estratega',     chatEstratega);
 router.post('/analizar-producto',  analizarProducto);
 router.get('/fichas/:id',          getFicha);

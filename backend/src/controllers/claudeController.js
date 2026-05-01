@@ -838,3 +838,90 @@ export const agenteReproposito = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+// ---------------------------------------------------------------
+// POST /api/claude/generar-skill
+// Genera de forma atómica y por streaming una skill en particular
+// Body: { guion, atributos_producto, marca_config, instrucciones_skill }
+// ---------------------------------------------------------------
+export const generarSkill = async (req, res) => {
+  const { guion, atributos_producto, marca_config, instrucciones_skill } = req.body;
+
+  if (!guion || !instrucciones_skill) {
+    return res.status(400).json({ success: false, error: 'guion e instrucciones_skill son obligatorios' });
+  }
+
+  const client = getClaudeClient();
+
+  const marcaCtx = `- Nombre: ${marca_config?.nombre_marca || 'No especificada'}
+- Industria: ${marca_config?.industria || ''}
+- Propuesta de valor: ${marca_config?.propuesta_valor || ''}
+- Tono de voz: ${marca_config?.tono_voz || 'profesional'}
+- Arquetipos: ${marca_config?.arquetipos?.length ? marca_config.arquetipos.join(', ') : 'No definidos'}
+- Buyer persona: ${marca_config?.buyer_persona?.nombre
+    ? `${marca_config.buyer_persona.nombre}, ${marca_config.buyer_persona.ocupacion}. Dolor: ${marca_config.buyer_persona.dolor_principal}`
+    : 'No definido'}`;
+
+  const visionCtx = atributos_producto ? `
+**Atributos Físicos del Producto (Detectados por Vision IA):**
+- Forma: ${atributos_producto.forma || 'N/A'}
+- Material: ${atributos_producto.material || 'N/A'}
+- Funcionalidad: ${atributos_producto.funcionalidad || 'N/A'}
+Toma muy en cuenta estos atributos físicos reales al generar tu respuesta para asegurar fidelidad técnica.
+` : '';
+
+  try {
+    const stream = client.messages.stream({
+      model: CLAUDE_MODELS.PRINCIPAL,
+      max_tokens: 8000,
+      thinking: { type: 'adaptive' },
+      system: [
+        {
+          type: 'text',
+          text: `Eres un experto en producción audiovisual y marketing de contenido.
+Tu misión es generar ÚNICAMENTE el entregable para esta habilidad técnica.
+No saludes ni expliques qué vas a hacer. Entrega el resultado directo, usando markdown para estructurarlo bien.
+INSTRUCCIONES ESPECÍFICAS DE TU ROL:
+${instrucciones_skill}`,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: `Genera el entregable para esta producción basado en la información a continuación:
+
+**GUION BASE:**
+${guion}
+
+**CONTEXTO DE MARCA:**
+${marcaCtx}
+${visionCtx}
+`,
+        },
+      ],
+    });
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    stream.on('text', (text) => {
+      res.write(`data: ${JSON.stringify({ type: 'text', text })}\n\n`);
+    });
+
+    stream.on('finalMessage', () => {
+      res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+      res.end();
+    });
+
+    stream.on('error', (err) => {
+      console.error('[ClaudeController][generarSkill]', err.message);
+      res.write(`data: ${JSON.stringify({ type: 'error', error: err.message })}\n\n`);
+      res.end();
+    });
+  } catch (err) {
+    console.error('[ClaudeController][generarSkill]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

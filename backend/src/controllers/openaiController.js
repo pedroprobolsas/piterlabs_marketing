@@ -1,0 +1,100 @@
+import OpenAI from 'openai';
+import { getClaudeClient, CLAUDE_MODELS } from '../services/claudeClient.js';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// ---------------------------------------------------------------
+// POST /api/openai/generar-miniatura
+// Genera dos miniaturas (16:9 y 9:16) usando Claude para el prompt y OpenAI (DALL-E 3) para la imagen
+// Body: { guion, atributos_producto, marca_config }
+// ---------------------------------------------------------------
+export const generarMiniatura = async (req, res) => {
+  const { guion, atributos_producto, marca_config } = req.body;
+
+  if (!guion) {
+    return res.status(400).json({ success: false, error: 'El guion es obligatorio' });
+  }
+
+  try {
+    // 1. Llamar a Claude para crear el prompt visual maestro
+    const claudeClient = getClaudeClient();
+    
+    const marcaCtx = `- Nombre: ${marca_config?.nombre_marca || 'No especificada'}
+- Industria: ${marca_config?.industria || ''}
+- Tono de voz: ${marca_config?.tono_voz || 'profesional'}
+- Arquetipos: ${marca_config?.arquetipos?.length ? marca_config.arquetipos.join(', ') : 'No definidos'}`;
+
+    const visionCtx = atributos_producto ? `
+- Forma: ${atributos_producto.forma || 'N/A'}
+- Material: ${atributos_producto.material || 'N/A'}
+- Funcionalidad: ${atributos_producto.funcionalidad || 'N/A'}` : 'Sin producto específico detectado.';
+
+    const systemPrompt = `Eres un Director de Arte y Experto en Miniaturas Virales de YouTube/TikTok. 
+Tu tarea es leer el guion y el contexto de la marca para generar un PROMPT EXACTO en inglés para un modelo generador de imágenes (DALL-E 3).
+El prompt debe describir una composición visual hiper-impactante, realista y muy llamativa.
+Debe incluir: composición, ángulos de cámara, iluminación, paleta de colores (basada en la marca), y detalles del producto.
+IMPORTANTE: NO devuelvas ninguna explicación, saludos ni markdown. Devuelve SOLO el texto del prompt en inglés.`;
+
+    const userPrompt = `Crea el prompt para la miniatura del siguiente video:
+
+**GUION BASE:**
+${guion}
+
+**CONTEXTO DE MARCA:**
+${marcaCtx}
+
+**ATRIBUTOS DEL PRODUCTO:**
+${visionCtx}
+
+Escribe SOLO el prompt visual en inglés, max 100 palabras. Asegúrate de incluir instrucciones para texto grande y llamativo (Zero-Click style) si el guion lo sugiere.`;
+
+    const claudeMessage = await claudeClient.messages.create({
+      model: CLAUDE_MODELS.RAPIDO,
+      max_tokens: 300,
+      system: [{ type: 'text', text: systemPrompt }],
+      messages: [{ role: 'user', content: userPrompt }]
+    });
+
+    const dallEPrompt = claudeMessage.content.find(b => b.type === 'text')?.text || '';
+
+    if (!dallEPrompt) {
+      throw new Error('Claude no pudo generar el prompt para la miniatura.');
+    }
+
+    // 2. Llamar a OpenAI en paralelo para los dos formatos (16:9 y 9:16)
+    // DALL-E 3 soporta 1024x1024, 1024x1792 (9:16) y 1792x1024 (16:9)
+    const [resWide, resVertical] = await Promise.all([
+      openai.images.generate({
+        model: "dall-e-3",
+        prompt: dallEPrompt + " (Wide shot, cinematic lighting)",
+        size: "1792x1024",
+        response_format: "b64_json",
+        n: 1,
+      }).catch(e => ({ error: e.message })),
+      openai.images.generate({
+        model: "dall-e-3",
+        prompt: dallEPrompt + " (Vertical shot, ideal for TikTok/Reels, cinematic lighting)",
+        size: "1024x1792",
+        response_format: "b64_json",
+        n: 1,
+      }).catch(e => ({ error: e.message }))
+    ]);
+
+    const result = {
+      prompt_usado: dallEPrompt,
+      imagen_16_9: resWide.data ? `data:image/png;base64,${resWide.data[0].b64_json}` : null,
+      imagen_9_16: resVertical.data ? `data:image/png;base64,${resVertical.data[0].b64_json}` : null,
+      errores: []
+    };
+
+    if (resWide.error) result.errores.push(`Error 16:9: ${resWide.error}`);
+    if (resVertical.error) result.errores.push(`Error 9:16: ${resVertical.error}`);
+
+    res.json({ success: true, data: result });
+  } catch (err) {
+    console.error('[OpenAIController][generarMiniatura]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

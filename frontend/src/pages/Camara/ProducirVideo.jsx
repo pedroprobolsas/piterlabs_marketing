@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Video, Package, UploadCloud, X, RefreshCw, FileText, Smartphone } from 'lucide-react';
+import { Video, Package, UploadCloud, X, RefreshCw, FileText, Smartphone, ImagePlus, Download, AlertTriangle } from 'lucide-react';
 import { useMarca } from '../../hooks/useMarca';
 import SkillCard from '../../components/camara/SkillCard';
 import CaptionLayer from '../../components/camara/CaptionLayer';
@@ -156,8 +156,49 @@ export default function ProducirVideo() {
       .catch(err => console.error('Error fetching skills:', err));
   }, []);
 
-  // SECCIÓN 3: PREVIEW CAPTION
-  const [previewCaption, setPreviewCaption] = useState('ESCRIBE UN TEXTO\nPARA PROBAR EL VISUAL');
+  // SECCIÓN 3: MINIATURA
+  const [miniaturaLoading, setMiniaturaLoading] = useState(false);
+  const [miniaturaData, setMiniaturaData] = useState(null);
+  const [miniaturaError, setMiniaturaError] = useState(null);
+
+  const handleGenerarMiniaturas = async () => {
+    if (!guion || guion.trim().length < 20) {
+      setMiniaturaError('Se requiere un guion base válido (mín. 20 caracteres) en la sección TU MATERIAL.');
+      return;
+    }
+    setMiniaturaLoading(true);
+    setMiniaturaError(null);
+    setMiniaturaData(null);
+
+    try {
+      const res = await fetch('/api/openai/generar-miniatura', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guion,
+          atributos_producto: adn,
+          marca_config: marca
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error);
+      setMiniaturaData(json.data);
+      if (json.data.errores?.length > 0) {
+         setMiniaturaError(json.data.errores.join(' | '));
+      }
+    } catch (e) {
+      setMiniaturaError(e.message);
+    } finally {
+      setMiniaturaLoading(false);
+    }
+  };
+
+  const handleDescargar = (base64Url, format) => {
+    const a = document.createElement('a');
+    a.href = base64Url;
+    a.download = `miniatura_${format}_${Date.now()}.png`;
+    a.click();
+  };
 
   return (
     <div className="w-full max-w-[1200px] space-y-[40px]">
@@ -169,7 +210,7 @@ export default function ProducirVideo() {
           <h2 className="font-bebas text-[1.8rem] tracking-[3px] text-text-main">PRODUCIR VIDEO</h2>
         </div>
         <p className="font-jetbrains text-[0.7rem] text-muted">
-          Genera tus componentes de producción de forma atómica e independiente.
+          Genera tus componentes de producción y la miniatura real con IA.
         </p>
       </div>
 
@@ -273,56 +314,96 @@ export default function ProducirVideo() {
         )}
       </section>
 
-      {/* SECCIÓN 3 — PREVIEW */}
+      {/* SECCIÓN 3 — MINIATURA */}
       <section>
         <div className="flex items-center justify-between mb-[16px]">
           <div className="flex items-center gap-[8px]">
             <span className="font-jetbrains text-[0.65rem] bg-text-main text-white px-[8px] py-[2px] rounded-sm font-bold tracking-[1px]">3</span>
-            <h3 className="font-bebas text-[1.3rem] tracking-[1.5px] text-text-main">PREVIEW VIRAL</h3>
+            <h3 className="font-bebas text-[1.3rem] tracking-[1.5px] text-text-main">MINIATURA (IMAGEN REAL)</h3>
           </div>
+          {!miniaturaLoading && (
+            <button
+              onClick={handleGenerarMiniaturas}
+              className="flex items-center gap-[6px] bg-magenta text-white font-jetbrains text-[0.65rem] font-bold px-[14px] py-[8px] rounded-[8px] cursor-pointer hover:bg-magenta-bright transition-all shadow-md"
+            >
+              <ImagePlus size={14} />
+              {miniaturaData || miniaturaError ? 'REINTENTAR' : 'GENERAR MINIATURAS'}
+            </button>
+          )}
         </div>
 
-        <div className="flex flex-col md:flex-row gap-[30px] items-start bg-white border border-border p-[30px] rounded-[14px]">
-          {/* Mockup 9:16 */}
-          <div className="relative w-[280px] h-[500px] bg-black rounded-[24px] shadow-2xl overflow-hidden shrink-0 border-[6px] border-text-main mx-auto md:mx-0">
-            {/* Background */}
-            {imagenBase64 ? (
-              <div 
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-10000 ease-linear hover:scale-110"
-                style={{ backgroundImage: `url(${imagenBase64})`, opacity: 0.8 }}
-              />
-            ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900">
-                <Smartphone size={32} className="text-zinc-700 mb-[10px]" />
-                <span className="font-jetbrains text-[0.6rem] text-zinc-600">SIN IMAGEN DE PRODUCTO</span>
-              </div>
-            )}
-            
-            {/* Vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
-
-            {/* Zero-Click Captions Overlay */}
-            <CaptionLayer text={previewCaption} style="viral" />
-          </div>
-
-          {/* Preview Controls */}
-          <div className="flex-1 space-y-[16px] w-full">
-            <p className="font-jetbrains text-[0.7rem] text-muted">
-              Usa este simulador para probar cómo se verán los hooks (Zero-Click Captions) sobre tu producto antes de grabarlo.
-            </p>
-            <div>
-              <label className="font-jetbrains text-[0.65rem] text-text2 font-bold mb-[6px] block uppercase tracking-[1px]">Texto del Hook</label>
-              <textarea
-                value={previewCaption}
-                onChange={e => setPreviewCaption(e.target.value)}
-                className="input-base w-full min-h-[100px] resize-y font-jetbrains text-[0.75rem] text-center"
-                placeholder="Escribe un hook impactante..."
-              />
+        <div className="bg-white border border-border p-[20px] rounded-[14px] shadow-sm">
+          {miniaturaLoading && (
+            <div className="flex flex-col items-center justify-center py-[60px] gap-[15px]">
+              <RefreshCw size={32} className="text-magenta animate-spin" />
+              <p className="font-jetbrains text-[0.7rem] text-muted text-center leading-relaxed">
+                <strong className="text-text-main block mb-[4px]">Paso 1: Claude está diseñando el prompt visual perfecto...</strong>
+                Paso 2: OpenAI (DALL-E 3) generará dos imágenes reales en alta resolución.
+              </p>
             </div>
-            <p className="font-jetbrains text-[0.6rem] text-violet mt-[10px]">
-              Tip: Copia el mejor hook generado por tus skills y pégalo aquí para visualizar el impacto final.
-            </p>
-          </div>
+          )}
+
+          {miniaturaError && !miniaturaLoading && (
+            <div className="flex flex-col items-center justify-center py-[40px] gap-[10px] bg-red/5 border border-red/20 rounded-[10px]">
+              <AlertTriangle size={24} className="text-red" />
+              <p className="font-jetbrains text-[0.65rem] text-red">{miniaturaError}</p>
+            </div>
+          )}
+
+          {miniaturaData && !miniaturaLoading && (
+            <div className="space-y-[20px]">
+              <div className="bg-bg-soft border border-border-soft p-[12px] rounded-[8px]">
+                <p className="font-jetbrains text-[0.55rem] text-muted uppercase tracking-[1px] mb-[4px] font-bold">Prompt usado (Claude)</p>
+                <p className="font-jetbrains text-[0.65rem] text-text-main italic">{miniaturaData.prompt_usado}</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-[30px]">
+                {/* 16:9 */}
+                <div className="flex flex-col items-center gap-[12px]">
+                  <h4 className="font-jetbrains text-[0.7rem] font-bold text-text-main tracking-[1px]">FORMATO 16:9 (YouTube / LinkedIn)</h4>
+                  {miniaturaData.imagen_16_9 ? (
+                    <>
+                      <div className="w-full aspect-video bg-black rounded-[12px] overflow-hidden shadow-md border border-border">
+                        <img src={miniaturaData.imagen_16_9} alt="Miniatura 16:9" className="w-full h-full object-cover" />
+                      </div>
+                      <button
+                        onClick={() => handleDescargar(miniaturaData.imagen_16_9, '16x9')}
+                        className="flex items-center gap-[6px] bg-white border border-border text-text-main hover:text-magenta hover:border-magenta/50 font-jetbrains text-[0.65rem] font-bold px-[16px] py-[8px] rounded-[8px] cursor-pointer transition-all w-full justify-center"
+                      >
+                        <Download size={14} /> DESCARGAR 16:9
+                      </button>
+                    </>
+                  ) : (
+                    <div className="w-full aspect-video bg-bg-soft rounded-[12px] flex items-center justify-center border border-border-soft">
+                      <span className="font-jetbrains text-[0.6rem] text-muted">Error al generar esta versión</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 9:16 */}
+                <div className="flex flex-col items-center gap-[12px]">
+                  <h4 className="font-jetbrains text-[0.7rem] font-bold text-text-main tracking-[1px]">FORMATO 9:16 (TikTok / Reels)</h4>
+                  {miniaturaData.imagen_9_16 ? (
+                    <>
+                      <div className="h-[400px] aspect-[9/16] bg-black rounded-[12px] overflow-hidden shadow-md border border-border">
+                        <img src={miniaturaData.imagen_9_16} alt="Miniatura 9:16" className="w-full h-full object-cover" />
+                      </div>
+                      <button
+                        onClick={() => handleDescargar(miniaturaData.imagen_9_16, '9x16')}
+                        className="flex items-center gap-[6px] bg-white border border-border text-text-main hover:text-magenta hover:border-magenta/50 font-jetbrains text-[0.65rem] font-bold px-[16px] py-[8px] rounded-[8px] cursor-pointer transition-all w-[225px] justify-center"
+                      >
+                        <Download size={14} /> DESCARGAR 9:16
+                      </button>
+                    </>
+                  ) : (
+                    <div className="h-[400px] aspect-[9/16] bg-bg-soft rounded-[12px] flex items-center justify-center border border-border-soft">
+                      <span className="font-jetbrains text-[0.6rem] text-muted">Error al generar esta versión</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

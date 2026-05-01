@@ -452,7 +452,7 @@ export const generarBrief = async (req, res) => {
   let skills;
   try {
     const { rows } = await pool.query(
-      "SELECT clave, nombre, instrucciones FROM marketing.skills WHERE activa = TRUE AND clave != 'estratega_interactivo' ORDER BY orden"
+      "SELECT clave, nombre, instrucciones FROM marketing.skills WHERE activa = TRUE AND clave NOT IN ('estratega_interactivo', 'guion_grafico') ORDER BY orden"
     );
     skills = rows;
   } catch (dbErr) {

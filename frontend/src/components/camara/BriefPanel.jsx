@@ -59,7 +59,10 @@ export default function BriefPanel({ marca, mediaFile }) {
       .then(r => r.json())
       .then(json => {
         if (json.success) {
-          const active = json.data.filter(s => s.activa && s.clave !== 'estratega_interactivo');
+          // guion_grafico y estratega_interactivo son skills de configuración interna,
+          // no deben aparecer como output del Brief de Producción
+          const BRIEF_EXCLUDED = ['estratega_interactivo', 'guion_grafico'];
+          const active = json.data.filter(s => s.activa && !BRIEF_EXCLUDED.includes(s.clave));
           setSkills(active);
           if (active.length > 0) setActiveTab(active[0].clave);
         }

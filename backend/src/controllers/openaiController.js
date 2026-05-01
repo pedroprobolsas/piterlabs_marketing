@@ -70,22 +70,20 @@ Escribe SOLO el prompt visual en inglés, max 100 palabras. Asegúrate de inclui
         model: "gpt-image-2",
         prompt: dallEPrompt + " (Wide shot, cinematic lighting)",
         size: "1792x1024",
-        response_format: "b64_json",
         n: 1,
       }).catch(e => ({ error: e.message })),
       openai.images.generate({
         model: "gpt-image-2",
         prompt: dallEPrompt + " (Vertical shot, ideal for TikTok/Reels, cinematic lighting)",
         size: "1024x1792",
-        response_format: "b64_json",
         n: 1,
       }).catch(e => ({ error: e.message }))
     ]);
 
     const result = {
       prompt_usado: dallEPrompt,
-      imagen_16_9: resWide.data ? `data:image/png;base64,${resWide.data[0].b64_json}` : null,
-      imagen_9_16: resVertical.data ? `data:image/png;base64,${resVertical.data[0].b64_json}` : null,
+      imagen_16_9: resWide.data ? resWide.data[0].url : null,
+      imagen_9_16: resVertical.data ? resVertical.data[0].url : null,
       errores: []
     };
 

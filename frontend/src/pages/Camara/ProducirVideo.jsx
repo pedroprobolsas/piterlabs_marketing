@@ -193,9 +193,10 @@ export default function ProducirVideo() {
     }
   };
 
-  const handleDescargar = (base64Url, format) => {
+  const handleDescargar = (imageUrl, format) => {
     const a = document.createElement('a');
-    a.href = base64Url;
+    a.href = imageUrl;
+    a.target = '_blank';
     a.download = `miniatura_${format}_${Date.now()}.png`;
     a.click();
   };

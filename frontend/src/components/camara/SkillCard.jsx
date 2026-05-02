@@ -74,14 +74,14 @@ export default function SkillCard({ skill, guion, atributosProducto, marcaConfig
   };
 
   return (
-    <div className="bg-white border border-border rounded-[14px] flex flex-col shadow-sm relative">
-      <div className="p-[16px_20px] border-b border-border-soft flex items-center justify-between bg-bg-soft/50 rounded-t-[14px]">
+    <div className="bg-white border-[0.5px] border-border hover:border-magenta rounded-[14px] flex flex-col shadow-sm relative transition-colors">
+      <div className="p-[14px_16px] border-b border-border-soft flex items-center gap-[8px] rounded-t-[14px]">
         <div className="flex-1 min-w-0">
-          <h3 className="font-bebas text-[1.1rem] tracking-[1px] text-text-main">{skill.nombre}</h3>
-          <p className="font-jetbrains text-[0.65rem] text-muted truncate">{skill.descripcion}</p>
+          <h3 className="font-jetbrains text-[0.75rem] font-bold uppercase tracking-[0.5px] text-text-main">{skill.nombre}</h3>
+          {skill.descripcion && <p className="font-jetbrains text-[0.69rem] text-muted truncate mt-[1px]">{skill.descripcion}</p>}
         </div>
         {skill.descripcion && (
-          <div className="relative shrink-0 ml-[8px]">
+          <div className="relative shrink-0">
             <button
               onClick={() => setShowTip(v => !v)}
               className="w-[18px] h-[18px] flex items-center justify-center rounded-full text-muted hover:text-magenta hover:bg-magenta/10 transition-all cursor-pointer"
@@ -98,7 +98,7 @@ export default function SkillCard({ skill, guion, atributosProducto, marcaConfig
         {!loading && !result && (
           <button
             onClick={handleGenerar}
-            className="flex items-center gap-[6px] bg-magenta text-white font-jetbrains text-[0.65rem] font-bold px-[14px] py-[8px] rounded-[8px] cursor-pointer hover:bg-magenta-bright transition-all shadow-[0_2px_8px_rgba(204,0,204,0.2)]"
+            className="shrink-0 flex items-center gap-[6px] bg-magenta text-white font-jetbrains text-[0.65rem] font-bold px-[12px] py-[6px] rounded-[7px] cursor-pointer hover:bg-magenta-bright transition-all shadow-[0_2px_8px_rgba(204,0,204,0.2)]"
           >
             <Play size={12} fill="currentColor" />
             GENERAR

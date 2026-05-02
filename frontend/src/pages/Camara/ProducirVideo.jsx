@@ -218,13 +218,14 @@ export default function ProducirVideo() {
       {/* SECCIÓN 1 — TU MATERIAL */}
       <section>
         <div className="flex items-center gap-[8px] mb-[16px]">
-          <span className="font-jetbrains text-[0.65rem] bg-text-main text-white px-[8px] py-[2px] rounded-sm font-bold tracking-[1px]">1</span>
+          <span className="font-jetbrains text-[0.9rem] text-magenta font-bold">①</span>
+          <span className="w-[4px] h-[4px] rounded-full bg-magenta shrink-0"></span>
           <h3 className="font-bebas text-[1.3rem] tracking-[1.5px] text-text-main">TU MATERIAL</h3>
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[20px]">
+
+        <div className="grid grid-cols-2 gap-[20px]">
           {/* GUION */}
-          <div className="bg-white border border-border rounded-[14px] p-[18px_20px] shadow-sm flex flex-col">
+          <div className="bg-white border border-border rounded-[14px] p-[18px_20px] shadow-sm flex flex-col" style={{borderLeft: '2px solid #cc00cc'}}>
             <label className="font-jetbrains text-[0.68rem] text-text2 uppercase tracking-[1.5px] font-bold block mb-[8px] flex items-center gap-[6px]">
               <FileText size={14} className="text-magenta" />
               Guion Base
@@ -292,7 +293,8 @@ export default function ProducirVideo() {
       {/* SECCIÓN 2 — GENERA TU CONTENIDO */}
       <section>
         <div className="flex items-center gap-[8px] mb-[16px]">
-          <span className="font-jetbrains text-[0.65rem] bg-text-main text-white px-[8px] py-[2px] rounded-sm font-bold tracking-[1px]">2</span>
+          <span className="font-jetbrains text-[0.9rem] text-magenta font-bold">②</span>
+          <span className="w-[4px] h-[4px] rounded-full bg-magenta shrink-0"></span>
           <h3 className="font-bebas text-[1.3rem] tracking-[1.5px] text-text-main">GENERA TU CONTENIDO</h3>
         </div>
 
@@ -301,7 +303,7 @@ export default function ProducirVideo() {
             Cargando habilidades... (Asegúrate de tener skills activas en Ajustes)
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+          <div className="grid grid-cols-2 gap-[20px]">
             {skills.map(skill => (
               <SkillCard
                 key={skill.clave}
@@ -319,7 +321,8 @@ export default function ProducirVideo() {
       <section>
         <div className="flex items-center justify-between mb-[16px]">
           <div className="flex items-center gap-[8px]">
-            <span className="font-jetbrains text-[0.65rem] bg-text-main text-white px-[8px] py-[2px] rounded-sm font-bold tracking-[1px]">3</span>
+            <span className="font-jetbrains text-[0.9rem] text-magenta font-bold">③</span>
+            <span className="w-[4px] h-[4px] rounded-full bg-magenta shrink-0"></span>
             <h3 className="font-bebas text-[1.3rem] tracking-[1.5px] text-text-main">MINIATURA (IMAGEN REAL)</h3>
           </div>
           {!miniaturaLoading && (
@@ -358,7 +361,7 @@ export default function ProducirVideo() {
                 <p className="font-jetbrains text-[0.65rem] text-text-main italic">{miniaturaData.prompt_usado}</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-[30px]">
+              <div className="grid grid-cols-2 gap-[20px]">
                 {/* 16:9 */}
                 <div className="flex flex-col items-center gap-[12px]">
                   <h4 className="font-jetbrains text-[0.7rem] font-bold text-text-main tracking-[1px]">FORMATO 16:9 (YouTube / LinkedIn)</h4>

@@ -1,10 +1,6 @@
 import OpenAI from 'openai';
 import { getClaudeClient, CLAUDE_MODELS } from '../services/claudeClient.js';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 // ---------------------------------------------------------------
 // POST /api/openai/generar-miniatura
 // Genera dos miniaturas (16:9 y 9:16) usando Claude para el prompt y OpenAI (gpt-image-2) para la imagen
@@ -12,6 +8,7 @@ const openai = new OpenAI({
 // ---------------------------------------------------------------
 export const generarMiniatura = async (req, res) => {
   const { guion, atributos_producto, marca_config } = req.body;
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   if (!guion) {
     return res.status(400).json({ success: false, error: 'El guion es obligatorio' });

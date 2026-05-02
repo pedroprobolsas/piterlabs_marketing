@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { Play, Copy, Check, RefreshCw } from 'lucide-react';
+import { Play, Copy, Check, RefreshCw, HelpCircle } from 'lucide-react';
 
 export default function SkillCard({ skill, guion, atributosProducto, marcaConfig }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showTip, setShowTip] = useState(false);
   const resultRef = useRef(null);
 
   // Auto-scroll as result streams
@@ -73,12 +74,27 @@ export default function SkillCard({ skill, guion, atributosProducto, marcaConfig
   };
 
   return (
-    <div className="bg-white border border-border rounded-[14px] overflow-hidden flex flex-col shadow-sm">
-      <div className="p-[16px_20px] border-b border-border-soft flex items-center justify-between bg-bg-soft/50">
-        <div>
+    <div className="bg-white border border-border rounded-[14px] flex flex-col shadow-sm relative">
+      <div className="p-[16px_20px] border-b border-border-soft flex items-center justify-between bg-bg-soft/50 rounded-t-[14px]">
+        <div className="flex-1 min-w-0">
           <h3 className="font-bebas text-[1.1rem] tracking-[1px] text-text-main">{skill.nombre}</h3>
-          <p className="font-jetbrains text-[0.65rem] text-muted">{skill.descripcion}</p>
+          <p className="font-jetbrains text-[0.65rem] text-muted truncate">{skill.descripcion}</p>
         </div>
+        {skill.descripcion && (
+          <div className="relative shrink-0 ml-[8px]">
+            <button
+              onClick={() => setShowTip(v => !v)}
+              className="w-[18px] h-[18px] flex items-center justify-center rounded-full text-muted hover:text-magenta hover:bg-magenta/10 transition-all cursor-pointer"
+            >
+              <HelpCircle size={14} />
+            </button>
+            {showTip && (
+              <div className="absolute right-0 top-[22px] z-50 w-[260px] bg-white border border-border rounded-[10px] shadow-lg p-[12px]">
+                <p className="font-jetbrains text-[0.65rem] text-text-main leading-relaxed">{skill.descripcion}</p>
+              </div>
+            )}
+          </div>
+        )}
         {!loading && !result && (
           <button
             onClick={handleGenerar}

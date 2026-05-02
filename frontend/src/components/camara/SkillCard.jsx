@@ -74,8 +74,8 @@ export default function SkillCard({ skill, guion, atributosProducto, marcaConfig
   };
 
   return (
-    <div className="bg-white border-[0.5px] border-border hover:border-magenta rounded-[14px] flex flex-col shadow-sm relative transition-colors">
-      <div className="p-[14px_16px] border-b border-border-soft flex items-center gap-[8px] rounded-t-[14px]">
+    <div className="skill-card bg-white flex flex-col shadow-sm relative">
+      <div className="p-[14px_16px] border-b border-border-soft flex items-center gap-[8px] rounded-t-[12px]">
         <div className="flex-1 min-w-0">
           <h3 className="font-jetbrains text-[0.75rem] font-bold uppercase tracking-[0.5px] text-text-main">{skill.nombre}</h3>
           {skill.descripcion && <p className="font-jetbrains text-[0.69rem] text-muted truncate mt-[1px]">{skill.descripcion}</p>}

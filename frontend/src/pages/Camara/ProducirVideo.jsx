@@ -225,7 +225,7 @@ export default function ProducirVideo() {
 
         <div className="grid grid-cols-2 gap-[20px]">
           {/* GUION */}
-          <div className="bg-white border border-border rounded-[14px] p-[18px_20px] shadow-sm flex flex-col" style={{borderLeft: '2px solid #cc00cc'}}>
+          <div className="bg-white border border-border rounded-[14px] p-[18px_20px] shadow-sm flex flex-col" style={{borderLeft: '3px solid #cc00cc'}}>
             <label className="font-jetbrains text-[0.68rem] text-text2 uppercase tracking-[1.5px] font-bold block mb-[8px] flex items-center gap-[6px]">
               <FileText size={14} className="text-magenta" />
               Guion Base
@@ -303,7 +303,7 @@ export default function ProducirVideo() {
             Cargando habilidades... (Asegúrate de tener skills activas en Ajustes)
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-[20px]">
+          <div className="grid grid-cols-2 gap-[10px]">
             {skills.map(skill => (
               <SkillCard
                 key={skill.clave}

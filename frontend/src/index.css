@@ -94,6 +94,16 @@ body {
   animation: parallax-float 6s ease-in-out infinite;
 }
 
+/* Skill card — explicit border ensures 0.5px renders (Tailwind border-[0.5px] omits border-style) */
+.skill-card {
+  border: 0.5px solid var(--color-border);
+  border-radius: 12px;
+  transition: border-color 0.15s;
+}
+.skill-card:hover {
+  border-color: var(--color-magenta);
+}
+
 /* Custom Scrollbar for non-Firefox */
 ::-webkit-scrollbar {
   width: 6px;

@@ -8,13 +8,17 @@ import { getClaudeClient, CLAUDE_MODELS } from '../services/claudeClient.js';
 // ---------------------------------------------------------------
 export const generarMiniatura = async (req, res) => {
   const { guion, atributos_producto, marca_config } = req.body;
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   if (!guion) {
     return res.status(400).json({ success: false, error: 'El guion es obligatorio' });
   }
 
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ success: false, error: 'OPENAI_API_KEY no configurada en el servidor.' });
+  }
+
   try {
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     // 1. Llamar a Claude para crear el prompt visual maestro
     const claudeClient = getClaudeClient();
     

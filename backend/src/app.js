@@ -22,9 +22,25 @@ app.use('/api/marca', marcaRoutes);
 app.use('/api/skills', skillsRoutes);
 app.use('/api/openai', openaiRoutes);
 
+// Healthcheck route para Docker Swarm
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: 'ok', message: 'API funcionando correctamente' });
+});
+
 // Configuración puerto (se usará el 5050 en docker-compose)
 const PORT = process.env.PORT || 5050;
 
 app.listen(PORT, () => {
     console.log(`[PITERLABS] Backend operando en el puerto ${PORT}`);
+});
+
+// Manejo de errores no capturados para evitar que el contenedor quede bloqueado (Zombie)
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1); // Falla rápido para que Docker Swarm lo reinicie
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception thrown:', error);
+    process.exit(1); // Falla rápido para que Docker Swarm lo reinicie
 });
